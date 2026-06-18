@@ -1,0 +1,4 @@
+https://heasarc.gsfc.nasa.gov/W3Browse/star-catalog/bsc5p.html
+http://tdc-www.harvard.edu/software/catalogs/bsc5.readme
+
+right acension, declination -> place points on sphere and then figure out how to translate to 2D

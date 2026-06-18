@@ -1,0 +1,159 @@
+Parameters
+ADS
+If the star is in Aitken's Double Star Catalog (ADS), this parameter is the designation in that catalog.
+
+ADS_Comp
+The letter identification in the ADS.
+
+Alt_Name
+The alternative name for stars in the Bright Star Catalog. For those stars which have this information, this is usually the Flamsteed and/or Bayer constellation-based name for the star, e.g., 54Alp Peg, where 54 is the Flamsteed number and Alp (for Alpha) is the Bayer Greek letter.
+
+BII
+The galactic longitude of the object.
+
+BV_Color
+The B-V magnitude and colors on the UBV system.
+
+BV_Uncert
+If the magnitude or colors are uncertain, this is set to ':'; if the value is questionable, the uncertainty flag is set to '?'.
+
+CDec
+The Declination of the object, in sexagesimal format.
+
+CDec_1950
+Declination, Sexagesimal in 1950 coordinates
+
+Class
+Browse classification type. The classification is based on the 'Spect_Type' parameter, if one is available.
+
+CRA
+The Right Ascension of the object, in sexagesimal format.
+
+CRA_1950
+The Right Ascension of the object, in sexagesimal format and B1950 coordinates.
+
+Dec
+The Declination of the object.
+
+Dec_1900
+The Declination of the object, in B1900 coordinates.
+
+Dec_1950
+The Declination of the object, in B1950 coordinates
+
+DM_Cat
+The Durchmeusterung catalog ID.
+
+DM_Num
+The Durchmeusterung number.
+
+FK5
+This is the number of the object in the Fifth Fundamental Catalogue, if the star is included there.
+
+GLat
+The original galactic latitude coordinates from the original catalog.
+
+GLon
+The original galactic longitude coordinates from the original catalog.
+
+HD
+This is the Henry Draper Catalogue number.
+
+HR
+This is the Harvard Revised BS Catalogue number.
+
+IR_Flag
+This is the infrared source flag. This parameter will have a value of 'I' if the star is a known infrared source.
+
+LII
+The galactic latitude of the object.
+
+M_Cnt
+The total number of components assigned to a multiple system.
+
+M_ID
+The identification of the components.
+
+M_Mdiff
+The magnitude difference between two components of a double, or between the two brightest components of a multiple system.
+
+M_Sep
+The separation of two components of a double, or between the two brightest components of a multiple system.
+
+Multiple
+'Multiple' is coded as follows when the star is a known double or multiple: 'W' = Worley (1978) update of the IDS, 'D' = Duplicity discovered by occultation, or 'S' = Duplicity discovered by speckle interferometry.
+
+Name
+The standard name for the star, using the HR prefix. Note that stars in this catalog are also sometimes referred to using the prefix 'BS'.
+
+Note
+An asterisk '*' indicates a note about the star can be found in the remarks.
+
+Par_Code
+This flag determines the type of parallax; a 'D' indicates that the parallax is dynamical. Otherwise, the parallax is trigonometric.
+
+Parallax
+This is the parallax, in seconds of arc. See the 'Par_Code' field to determine whether the parallax is dynamical or trigonometric.
+
+PMDec
+The annual Declination proper motion in seconds of arc for the equinox J2000.0 in the FK5 system.
+
+PMRA
+The annual Right Ascension proper motion in seconds of arc for the equinox J2000.0 in the FK5 system.
+
+RA
+The Right Ascension of the object.
+
+RA_1900
+The Right Ascension of the object, in B1900 coordinates.
+
+RA_1950
+The Right Ascension of the object, in B1950 coordinates
+
+RadVel
+The heliocentric radial velocity in km/s.
+
+RadVel_Comm
+Comments on the radial velocity as follows: 'V' or 'V?' = variable or suspected variable radial velocity; 'SB', 'SB1', or 'SB2' = spectroscopic binaries, single or double lined spectra; 'O' = orbital data available.
+
+RI_Code
+A star on the RI system.
+
+RI_Color
+This is the R-I color of the star on the RI system. These codes are as follows: blank for the Johnson system, 'E' for Kron system colors measured mainly by Eggen, and 'C' for Cape (Cousins) system colors. Code 'D' has not been documented. Uncertainty ':' or questionable '?' are also indicated in this field.
+
+RotVel
+Limiting character: '<' for "less than", '=<' for "less than or equal to", and '>' for "greater than."
+
+RotVel_Comm
+The projected rotational velocity (v sin i).
+
+RotVel_Uncert
+A colon ':' in indicates an uncertain rotational velocity.
+
+SAO
+This is the Smithsonian Astrophysical Observatory Star Catalog number, if the object is listed in that catalog.
+
+Spect_Code
+Spectral type code. The codes 'e', 'v', and 't' are not documented.
+
+Spect_Type
+Spectral type on the standard Morgan-Keenan system and code.
+
+UB_Color
+The U-B magnitude and colors on the UBV system.
+
+UB_Uncert
+If the U-B color is uncertain, this is set to ':'; if the value is questionable, the uncertainty flag is set to '?'.
+
+Var_ID
+This is the variable star designation from the General Catalogue of Variable Stars or one of its Supplements, or from the Catalogue of Suspected Variable Stars, or simply the designation 'var'.
+
+Vmag
+Photographic magnitude.
+
+Vmag_Code
+The photographic magnitude may also be reduced to the UBV system from the Harvard Revised Photometry of 1908 (Vmag code = 'R'), or it may also be the original HR magnitude (Vmag code = 'H').
+
+Vmag_Uncert
+If the magnitude is uncertain, this is set to ':'; if the values is questionable, the uncertainty flag is set to '?'.

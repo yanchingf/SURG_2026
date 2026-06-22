@@ -1,5 +1,5 @@
 
-6/18/2026
-- need graph sweep algorithm for inactive nodes
-- need grouping algo on graph / decimation sweep
-    - dsj for group reassignment?
+6/22/2026
+
+- all the utilities are in, but are very basic / naive, which is fine for smaller dataset
+- test data generation next

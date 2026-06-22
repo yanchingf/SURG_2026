@@ -4,16 +4,17 @@ import heapq
 class Node:
 
     def __init__(self, range=0, active=True, id=-1, cluster_id=-2, x=0, y=0):
+        
         self.range = range
         self.id = id
         self.cluster_id = cluster_id
         self.active = active
-        self.coords = (self.x, self.y)
+        self.coords = (x, y)
 
     def __repr__(self):
-        print(f"Range: {self.range} | ID: {self.id} | Cluster ID: {self.cluster_id} | Active: {self.active}")
 
-# Edge (u, v, weight)
+        return f"Range: {self.range} | ID: {self.id} | Cluster ID: {self.cluster_id} | Active: {self.active}"
+
         
 class Graph:
 
@@ -26,31 +27,38 @@ class Graph:
         self.length = n
 
     def add_edge(self, u, v, weight):
+
         self.adj[u][v] = weight
         self.adj[v][u] = weight
 
     def remove_edge(self, u, v):
+
         self.adj[u].pop(v, None)
         self.adj[v].pop(u, None)
 
     def get_edge(self, u, v):
+
         return self.adj[u][v]
     
     def set_node_status(self, id, status):
-        self.nodes[id].active = False
+
+        self.nodes[id].active = status
 
     def get_cluster_members(self, cluster_id):
-        return [i.id for i in self.nodes if i.cluster_id==cluster_id]
+
+        return [i.id for i in self.nodes.values() if i.cluster_id==cluster_id]
     
     def merge_clusters(self, head, other):
+
         to_change = self.get_cluster_members(other)
         for i in to_change:
             self.nodes[i].cluster_id = self.nodes[head].cluster_id
 
     def djikstra(self, id):
+
         distances = [float("inf")] * self.length
         distances[id] = 0
-        pq = heapq([(0, id)])
+        pq = [(0, id)]
 
         while len(pq) > 0:
             curr_dist, u = heapq.heappop(pq)
@@ -61,7 +69,7 @@ class Graph:
             if not self.nodes[u].active:
                 continue
 
-            for v, weight in self.adj[u]:
+            for v, weight in self.adj[u].items():
                 if not self.nodes[v].active:
                     continue
 

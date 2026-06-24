@@ -3,9 +3,10 @@ import heapq
 
 class Node:
 
-    def __init__(self, range=0, active=True, id=-1, cluster_id=-2, x=0, y=0):
+    def __init__(self, range=0, traverse_range=0, active=True, id=-1, cluster_id=-2, x=0, y=0):
         
         self.range = range
+        self.traverse_range = traverse_range
         self.id = id
         self.cluster_id = cluster_id
         self.active = active
@@ -21,7 +22,7 @@ class Graph:
     def __init__(self, n):
 
         self.nodes = {i: Node(id=i, cluster_id=i) for i in range(n)}
-        self.adj = {i : {} for i in range(n)} # sparse adj
+        self.adj = [[0]*n for i in range(n)] # full adj matrix
         self.group_ids = {i: [i] for i in range(n)} # each in own cluster originally
 
         self.length = n
@@ -33,8 +34,8 @@ class Graph:
 
     def remove_edge(self, u, v):
 
-        self.adj[u].pop(v, None)
-        self.adj[v].pop(u, None)
+        self.adj[u][v] = None
+        self.adj[v][u] = None
 
     def get_edge(self, u, v):
 

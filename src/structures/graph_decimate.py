@@ -15,7 +15,7 @@ def search(graph): # helper func for finding largest interaction
 
     for i in graph.nodes.items():
         if i.range > curr[0] and i.active:
-            curr = (i.range, i.id, "Node")
+            curr = (i.traverse_range, i.id, "Node")
         
         # check all edges from node
         for v, weight in graph.adj[i.id].items():
@@ -29,28 +29,41 @@ def decimate(graph, obj):  # remove id, recalculate all edges
 
     if obj[2] == "Node":
 
-        neighbors = [i.id for i in graph.adj[obj[1]].items()]
+        node_id = obj[1]
+        node_range = obj[0]
 
-        graph.adj.remove(id)
+        neighbors = graph.adj[node_id]
 
         r = len(neighbors)
 
         for i in range(r):
             for j in range(i+1, r):
 
-                u, v = neighbors[i][j]
+                if (i != node_id and j != node_id) and (graph.nodes[i].active and graph.nodes[j].active):
 
-                if in_range(graph, u, v):
-                    graph.adjacent[u][v] = max(u.range, v.range) # check about this
-                    graph.adjacent[v][u] = max(u.range, v.range)
+                    J_ij, J_ik = neighbors[i], neighbors[j] 
+
+                    # largest term field => new couplings generated,
+                    # each calculated with strength J_jk ~= J_ij*J_ik / h_i
+
+                    new_strength = max(graph.adj[i][j], J_ij * J_ik / node_range)
+                    graph.adj[i][j] = new_strength
+                    graph.adj[j][i] = new_strength
                 
         graph.set_node_status(obj[1], False) 
-        for i in graph.adj[obj[1]].keys():
-            graph.remove_edge(obj[1], i)
         
         graph.merge_clusters(neighbors[0], neighbors[1:]) # reassign group ids
 
     else:
-        graph.remove_edge(obj[1][0], obj[1][1]) # renormalize
+
+        # if coupling, connected sites i and j go into same cluster
+
+        coupling_strength = obj[0]
+        u, v = obj[1][0], obj[1][1]
+
+        new_traverse = u.traverse_range * v.traverse_range / graph.adj[u][v]
+
+        u.group_id = v.group_id
+        u.traverse_range = new_traverse
 
     return 

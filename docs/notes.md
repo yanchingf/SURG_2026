@@ -1,5 +1,4 @@
 
-6/22/2026
+6/24/26
 
-- all the utilities are in, but are very basic / naive, which is fine for smaller dataset
-- test data generation next
+To-do: finalize edge decimation / check node decimation logic, combine in one SDRG function, and write script for random testing

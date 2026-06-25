@@ -1,7 +1,11 @@
 
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
+
 import heapq
 import math
-from graph import Graph
+from src.structures.graph import Graph
 
 def in_range(graph, u, v):
 
@@ -13,15 +17,17 @@ def search(graph): # helper func for finding largest interaction
 
     curr = (-1, None, None)
 
-    for i in graph.nodes.items():
-        if i.range > curr[0] and i.active:
-            curr = (i.traverse_range, i.id, "Node")
+    for node_id, node in graph.nodes.items():
+        if node.range > curr[0] and node.active:
+            curr = (node.traverse_range, node.id, "Node")
         
         # check all edges from node
-        for v, weight in graph.adj[i.id].items():
-            ok = in_range(graph, i.id, v)
-            if weight > curr[0] and ok:
-                curr = (weight, (i.id, v), "Edge")
+        for v in range(graph.length):
+            if v != node_id:
+                weight = graph.adj[node_id][v]
+                if weight > 0 and in_range(graph, node_id, v):
+                    if weight > curr[0]:
+                        curr = (weight, (node_id, v), "Edge")
 
     return curr # return type to decimate, exact interaction 
 
@@ -32,7 +38,7 @@ def decimate(graph, obj):  # remove id, recalculate all edges
         node_id = obj[1]
         node_range = obj[0]
 
-        neighbors = graph.adj[node_id]
+        neighbors = [v for v in range(graph.length) if graph.adj[node_id][v] > 0 and graph.nodes[v].active]
 
         r = len(neighbors)
 
@@ -40,19 +46,24 @@ def decimate(graph, obj):  # remove id, recalculate all edges
             for j in range(i+1, r):
 
                 if (i != node_id and j != node_id) and (graph.nodes[i].active and graph.nodes[j].active):
-
-                    J_ij, J_ik = neighbors[i], neighbors[j] 
+                    
+                    ni, nj = neighbors[i], neighbors[j]
+                    J_ij = graph.adj[node_id][ni]
+                    J_ik = graph.adj[node_id][nj]
 
                     # largest term field => new couplings generated,
                     # each calculated with strength J_jk ~= J_ij*J_ik / h_i
 
-                    new_strength = max(graph.adj[i][j], J_ij * J_ik / node_range)
-                    graph.adj[i][j] = new_strength
-                    graph.adj[j][i] = new_strength
+                    new_strength = max(graph.adj[ni][nj], J_ij * J_ik / node_range)
+                    graph.adj[ni][nj] = new_strength
+                    graph.adj[nj][ni] = new_strength
                 
-        graph.set_node_status(obj[1], False) 
-        
-        graph.merge_clusters(neighbors[0], neighbors[1:]) # reassign group ids
+        graph.set_node_status(node_id, False)
+
+        if len(neighbors) >= 1:
+            head = neighbors[0]
+            for other in neighbors[1:]:
+                graph.merge_clusters(head, graph.nodes[other].cluster_id)
 
     else:
 

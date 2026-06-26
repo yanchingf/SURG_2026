@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.patches as mpatches
+from datetime import datetime
 
 from src.structures.graph import Graph
 from src.structures.graph_decimate import search
@@ -89,7 +90,8 @@ def run_sdrg_random(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000):
     
     curr = search(g)
 
-    output_dir = os.path.join(os.path.dirname(__file__), '..', 'tests', 'random-plots')
+    run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_dir = os.path.join(os.path.dirname(__file__), '..', 'tests', 'random-plots', run_id)
 
     plot_graph(g, points, n, iteration=0, neg_x_lim=neg_x_lim, x_lim=x_lim, 
                neg_y_lim=neg_y_lim, y_lim=y_lim, output_dir=output_dir) # initial

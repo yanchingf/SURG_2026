@@ -76,14 +76,14 @@ def decimate(graph, obj):  # remove id, recalculate all edges
         coupling_strength = obj[0]
         u, v = graph.nodes[obj[1][0]], graph.nodes[obj[1][1]]
 
-        new_traverse = u.range * v.range / graph.adj[u][v]
+        new_traverse = u.range * v.range / graph.adj[u.id][v.id]
 
-        graph.merge_clusters(u, v.cluster_id)
+        graph.merge_clusters(u.id, v.cluster_id)
         u.range = new_traverse
 
-        graph.set_node_status(v, False)
+        graph.set_node_status(v.id, False)
         for k in range(graph.length):
-            if graph.adj[v][k] > 0:
-                graph.remove_edge(v, k)
+            if graph.adj[v.id][k] > 0:
+                graph.remove_edge(v.id, k)
 
     return 

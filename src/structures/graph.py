@@ -1,5 +1,6 @@
 
 import heapq
+import math
 
 class Node:
 
@@ -81,5 +82,21 @@ class Graph:
                     heapq.heappush(pq, (new_dist, v))
 
         return distances
-        
+
+
+def build_graph(x_arr, y_arr, ranges):
+
+    n = len(x_arr)
+    g = Graph(n)
     
+    for i in range(n):
+        g.nodes[i].x = x_arr[i]
+        g.nodes[i].y = y_arr[i]
+        g.nodes[i].range = ranges[i]
+
+    for i in range(n):
+        for j in range(i + 1, n):
+            d = math.sqrt((x_arr[i] - x_arr[j])**2 + (y_arr[i] - y_arr[j])**2)
+            g.add_edge(i, j, d)
+
+    return g   

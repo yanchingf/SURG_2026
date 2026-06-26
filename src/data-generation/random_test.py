@@ -12,6 +12,7 @@ import matplotlib.patches as mpatches
 from datetime import datetime
 
 from src.structures.graph import Graph
+from src.structures.graph_decimate import in_range
 from src.structures.graph_decimate import search
 from src.structures.graph_decimate import decimate
 
@@ -72,6 +73,17 @@ def plot_graph(g, points, n, iteration, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_
         sizes.append(max(0.001, g.nodes[i].range))
 
     plt.figure()
+
+    for i in range(n):
+        if g.nodes[i].active:
+            for j in range(i+1, n):
+                if not g.nodes[j].active:
+                    continue
+                if g.adj[i][j] > 0:
+                    plt.plot([points[0][i], points[0][j]],
+                            [points[1][i], points[1][j]],
+                            color='gray', lw=0.8, alpha=0.5, zorder=1)
+                
     plt.scatter(x, y, c=colors, marker='o', s=ranges)
     plt.title(f"SDRG Step {iteration} | {len(x)} active nodes")
     plt.xlim(neg_x_lim, x_lim)

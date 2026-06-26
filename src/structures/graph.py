@@ -3,14 +3,14 @@ import heapq
 
 class Node:
 
-    def __init__(self, range=0, traverse_range=0, active=True, id=-1, cluster_id=-2, x=0, y=0):
+    def __init__(self, range=0, active=True, id=-1, cluster_id=-2, x=0, y=0):
         
         self.range = range
-        self.traverse_range = traverse_range
         self.id = id
         self.cluster_id = cluster_id
         self.active = active
-        self.coords = (x, y)
+        self.x = x
+        self.y = y
 
     def __repr__(self):
 
@@ -34,8 +34,8 @@ class Graph:
 
     def remove_edge(self, u, v):
 
-        self.adj[u][v] = None
-        self.adj[v][u] = None
+        self.adj[u][v] = 0
+        self.adj[v][u] = 0
 
     def get_edge(self, u, v):
 

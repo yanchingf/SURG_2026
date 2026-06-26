@@ -33,9 +33,15 @@ def generate_random_graph(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000,
     for i in range(n):
         g.nodes[i].x = points[0][i]
         g.nodes[i].y = points[1][i]
-        g.nodes[i].range = np.random.randint(m_min, m_max) # visible brightness starts at +6... not sure about max brightness? 
+
+        g.nodes[i].range = max(1, np.random.randint(m_min, m_max)) # visible brightness starts at +6... not sure about max brightness? 
 
         sizes.append(g.nodes[i].range)
+
+    for i in range(n):
+        for j in range(i+1, n):
+            g.add_edge(i, j, math.sqrt((g.nodes[i].x - g.nodes[j].x)**2 + 
+                  (g.nodes[i].y - g.nodes[j].y)**2))
 
     plt.scatter(points[0], points[1], c=range(n), s=sizes, marker='o')
     plt.title(f"Randomly Generated Samples (n={n})")
@@ -50,24 +56,23 @@ def plot_graph(g, points, n, iteration, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_
     
     os.makedirs(output_dir, exist_ok=True)
 
-    active_x, active_y, colors, sizes = [], [], [], []
+    x, y, colors, sizes = [], [], [], []
 
-    ranges = [g.nodes[i].range for i in range(n) if g.nodes[i].active]
+    ranges = [g.nodes[i].range for i in range(n)]
 
     for i in range(n):
-        if g.nodes[i].active:
 
-            active_x.append(points[0][i])
-            active_y.append(points[1][i])
+        x.append(points[0][i])
+        y.append(points[1][i])
 
-            colors.append(g.nodes[i].cluster_id)
+        colors.append(g.nodes[i].cluster_id)
 
-            # need scaling for neg min size?
-            sizes.append(g.nodes[i].range)
+        # need scaling for neg min size?
+        sizes.append(max(0.001, g.nodes[i].range))
 
     plt.figure()
-    plt.scatter(active_x, active_y, c=colors, marker='o', s=sizes)
-    plt.title(f"SDRG Step {iteration} | {len(active_x)} active nodes")
+    plt.scatter(x, y, c=colors, marker='o', s=ranges)
+    plt.title(f"SDRG Step {iteration} | {len(x)} active nodes")
     plt.xlim(neg_x_lim, x_lim)
     plt.ylim(neg_y_lim, y_lim)
     plt.savefig(os.path.join(output_dir, f"step_{iteration}.png"))
@@ -91,9 +96,15 @@ def run_sdrg_random(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000):
 
 
     while curr[1] != None:
+
+        print(f"Step {iteration} | Ω={curr}") # print log
+        for i in range(n):
+            if g.nodes[i].active:
+                print(f"    id={g.nodes[i].id} h={g.nodes[i].range} cluster={g.nodes[i].cluster_id}")
+
         decimate(g, curr)
         plot_graph(g, points, n, iteration, output_dir=output_dir)
-        
+
         iteration += 1
         curr = search(g)
 

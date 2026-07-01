@@ -71,7 +71,7 @@ class Graph:
             if not self.nodes[u].active:
                 continue
 
-            for v, weight in self.adj[u].items():
+            for v, weight in self.adj[u].enumerate():
                 if not self.nodes[v].active:
                     continue
 

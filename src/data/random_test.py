@@ -42,11 +42,12 @@ def generate_random_graph(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000,
             g.add_edge(i, j, math.sqrt((g.nodes[i].x - g.nodes[j].x)**2 + 
                   (g.nodes[i].y - g.nodes[j].y)**2))
 
-    plt.scatter(points[0], points[1], c=range(n), s=sizes, marker='o')
+    #plt.scatter(points[0], points[1], c=range(n), s=sizes, marker='o')
+    plt.scatter(points[0], points[1], c=range(n), marker='o')
     plt.title(f"Randomly Generated Samples (n={n})")
     plt.xlim(neg_x_lim, x_lim)
     plt.ylim(neg_y_lim, y_lim)
-    plt.show()
+    # plt.show()
 
     return (g, points)
 

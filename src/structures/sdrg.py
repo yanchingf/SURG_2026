@@ -69,8 +69,6 @@ def plot_graph(g, points, n, iteration, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_
                     xytext=(5, 5), fontsize=7, color='black')
             ax.scatter(xx, yy, c="grey", s=40, zorder=3)
 
-
-
     ax.set_title(f"SDRG Step {iteration} | {n} nodes")
     ax.set_xlim(neg_x_lim, x_lim)
     ax.set_ylim(neg_y_lim, y_lim)
@@ -110,8 +108,7 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
 
         print(f"Step {iteration} | Ω={curr}") # print log
         for i in range(n):
-            if g.nodes[i].active:
-                print(f"    id={g.nodes[i].id} h={g.nodes[i].range} cluster={g.nodes[i].cluster_id}")
+            print(f"    id={g.nodes[i].id} h={g.nodes[i].range} cluster={g.nodes[i].cluster_id} active={g.nodes[i].active}")
 
         decimate(g, curr)
         plot_graph(g, points, n, iteration, neg_x_lim=neg_x_lim, x_lim=x_lim,
@@ -127,5 +124,43 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
 
 x = [100, 200, 300, 100, 200, 300, 100, 200, 300]
 y = [100, 200, 300, 200, 100, 200, 300, 300, 100]
-r = [100, 500, 100, 100, 100, 100, 100, 100, 100]
+r = [10, 300, 10, 10, 10, 10, 10, 10, 10]
+
+
+'''
+x = [200, 300, 400]
+y = [200, 200, 200]
+r = [300, 300, 300]
+'''
+
+'''
+x = [200, 400]
+y = [200, 200]
+r = [10, 300]
+'''
+
+'''
+x = [200, 400]
+y = [200, 200]
+r = [300, 300]
+'''
+
+'''
+x = [200, 300, 400]
+y = [200, 200, 200]
+r = [110, 110, 110]
+'''
+
+'''
+x = [100, 200, 500]
+y = [100, 100, 100]
+r = [110, 110, 110]
+'''
+
+'''
+x = [100, 200, 150]
+y = [100, 100, 186.6]
+r = [110, 110, 110]
+'''
+
 run_sdrg(5, 0, 1000, 0, 1000, False, (x, y, r))

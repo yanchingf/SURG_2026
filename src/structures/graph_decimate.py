@@ -18,50 +18,39 @@ def in_range(graph, u, v):
 
 def search(graph): # helper func for finding largest interaction
 
-    '''
-    pq = []
-
-    curr = (-1, None, None)
-
-    for node_id, node in graph.nodes.items():
-        if node.range > curr[0] and node.active:
-            curr = (node.range, node.id, "Node")
-        
-        # check all edges from node, do edge decimation iff two nodes in range of each other
-        for v in range(graph.length):
-            if v != node_id and graph.nodes[v].active:
-                weight = graph.adj[node_id][v]
-                if weight > 0 and in_range(graph, node_id, v):
-                    if weight > curr[0]:
-                        curr = (weight, (node_id, v), "Edge")
-      
-    return curr # return type to decimate, exact interaction '''
-
     active = [i for i, n in graph.nodes.items() if n.active]
-    if not active:
-        return (-1, None, None)
+    
+    curr = (-1, None, None)
+    best_distance_edge = (-1, None, None)
+    
+    if len(active) == 0:
+        return curr
 
-    start = random.choice(active)
+    for node_id in active:
+        if graph.nodes[node_id].range > curr[0]:
+            curr = (graph.nodes[node_id].range, node_id, "Node")
 
-    # find nearest active neighbor by distance
-    best_dist = float('inf')
-    best_neighbor = None
-    for v in range(graph.length):
-        if v != start and graph.nodes[v].active and graph.adj[start][v] > 0:
-            d = graph.adj[start][v]
-            if d < best_dist:
-                best_dist = d
-                best_neighbor = v
+        for v in active:
+            if v > node_id:
+                weight = graph.adj[node_id][v]
+                if weight > 0:
+                    if in_range(graph, node_id, v):
+                        if weight > best_distance_edge[0]: # distance based edges should have priority
+                            best_distance_edge = (weight, (node_id, v), "Edge")
+                    else:
+                        if weight > curr[0]: # new edges compete with nodes based on literal value
+                            curr = (weight, (node_id, v), "Edge")
 
-    if best_neighbor is None:
-        return (graph.nodes[start].range, start, "Node")
+        has_distance_edge = [graph.adj[node_id][v] > 0 and in_range(graph, node_id, v)
+                            for v in active if v != node_id]
+        
+        if len(has_distance_edge) <= 0 and graph.nodes[node_id].range > curr[0]:
+            curr = (graph.nodes[node_id].range, node_id, "Node")
 
-    local_max = max(graph.nodes[start].range, best_dist)
+    if best_distance_edge[1] is not None:
+        return best_distance_edge
 
-    if local_max== graph.nodes[start].range:
-        return (graph.nodes[start].range, start, "Node")
-    else:
-        return (best_dist, (start, best_neighbor), "Edge")
+    return curr
 
 
 def decimate(graph, obj):  # decimate node / edge
@@ -78,23 +67,19 @@ def decimate(graph, obj):  # decimate node / edge
 
         for i in range(r): 
             for j in range(i+1, r):
-
-                if (i != node_id and j != node_id) and (graph.nodes[i].active and graph.nodes[j].active):
-
-                    print("CONDITION PASSED")
                     
-                    ni, nj = neighbors[i], neighbors[j]
-                    J_ij = graph.adj[node_id][ni]
-                    J_ik = graph.adj[node_id][nj]
+                ni, nj = neighbors[i], neighbors[j]
+                J_ij = graph.adj[node_id][ni]
+                J_ik = graph.adj[node_id][nj]
 
-                    # largest term field => new couplings generated,
-                    # each calculated with strength J_jk ~= J_ij*J_ik / h_i
+                # largest term field => new couplings generated,
+                # each calculated with strength J_jk ~= J_ij*J_ik / h_i
 
-                    new_strength = max(graph.adj[ni][nj], J_ij * J_ik / node_range)
-                    graph.adj[ni][nj] = new_strength
-                    graph.adj[nj][ni] = new_strength
+                new_strength = max(graph.adj[ni][nj], J_ij * J_ik / node_range)
+                graph.adj[ni][nj] = new_strength
+                graph.adj[nj][ni] = new_strength
 
-                    print(f"Updated edges between {ni} and {nj}")
+                print(f"Updated edges between {ni} and {nj}")
                 
         graph.set_node_status(node_id, False)
 
@@ -105,23 +90,32 @@ def decimate(graph, obj):  # decimate node / edge
     else:
 
         # if coupling, connected sites i and j go into same cluster
-
-        coupling_strength = obj[0]
         u, v = graph.nodes[obj[1][0]], graph.nodes[obj[1][1]]
+        if v.range > u.range:
+            u, v = v, u
         v_id = v.id
 
-        new_traverse = u.range + v.range - graph.adj[u.id][v_id]
+        if in_range(graph, u.id, v_id):
+            new_traverse = max(0, u.range + v.range - graph.adj[u.id][v_id])
+        else:
+            new_traverse = u.range # negative safeguard
 
         print(f"  Edge decimate: u={u.id} (cluster={u.cluster_id}) v={v.id} (cluster={v.cluster_id})")
         print(f"  in_range check: {in_range(graph, u.id, v.id)}")
         print(f"  adj weight: {graph.adj[u.id][v.id]}")
 
+        for k in range(graph.length):
+            if not (k == u.id or k == v_id):
+                best = max(graph.adj[u.id][k], graph.adj[v_id][k])
+                graph.adj[u.id][k] = best
+                graph.adj[k][u.id] = best
+
         graph.merge_clusters(u.id, v.cluster_id)
         u.range = new_traverse
 
-        for v in graph.nodes.values(): # update for rest in cluster
-            if v.cluster_id == u.cluster_id and v.active:
-                v.range = new_traverse
+        for vv in graph.nodes.values(): # update for rest in cluster
+            if vv.cluster_id == u.cluster_id and vv.active:
+                vv.range = new_traverse
 
         graph.set_node_status(v_id, False)
         for k in range(graph.length):

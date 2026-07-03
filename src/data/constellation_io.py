@@ -80,6 +80,6 @@ def get_coords_and_brightness(df): # convert RA / Dec => cartesian coords & vama
     coords = SkyCoord(ra=ra, dec=dec, frame="icrs")
 
     vmag = df["Vmag"].to_numpy()
-    brightness = vmag # check with this, should be log
+    brightness = vmag # use with a constant
 
     return coords, brightness

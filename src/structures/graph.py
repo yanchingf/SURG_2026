@@ -71,7 +71,7 @@ class Graph:
             if not self.nodes[u].active:
                 continue
 
-            for v, weight in self.adj[u].enumerate():
+            for v, weight in enumerate(self.adj[u]):
                 if not self.nodes[v].active:
                     continue
 
@@ -97,6 +97,7 @@ def build_graph(x_arr, y_arr, ranges):
     for i in range(n):
         for j in range(i + 1, n):
             d = math.sqrt((x_arr[i] - x_arr[j])**2 + (y_arr[i] - y_arr[j])**2)
-            g.add_edge(i, j, d)
-
+            if d <= ranges[i] and d <= ranges[j]: 
+                g.add_edge(i, j, d)
+           
     return g   

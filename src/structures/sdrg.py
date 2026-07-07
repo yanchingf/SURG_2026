@@ -11,12 +11,11 @@ import matplotlib.cm as cm
 import matplotlib.patches as mpatches
 from datetime import datetime
 
-
 from graph import Graph
 from graph import build_graph
 from graph_decimate import decimate
 from graph_decimate import search
-from graph_decimate import in_range
+from graph_decimate import repair
 from src.data.random_test import generate_random_graph
 
 
@@ -115,17 +114,19 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
            neg_y_lim=neg_y_lim, y_lim=y_lim, output_dir=output_dir)
 
         iteration += 1
+
+        curr = repair(g)
         curr = search(g)
 
 
     print(f"Done at iteration {iteration}, plots saved to '{output_dir}/'")
     return g
 
-
+'''
 x = [100, 200, 300, 100, 200, 300, 100, 200, 300]
 y = [100, 200, 300, 200, 100, 200, 300, 300, 100]
-r = [10, 300, 10, 10, 10, 10, 10, 10, 10]
-
+r = [75, 300, 75, 75, 100, 100, 75, 75, 75]
+'''
 
 '''
 x = [200, 300, 400]
@@ -145,11 +146,11 @@ y = [200, 200]
 r = [300, 300]
 '''
 
-'''
-x = [200, 300, 400]
+
+x = [0, 100, 280]
 y = [200, 200, 200]
-r = [110, 110, 110]
-'''
+r = [150, 150, 150]
+
 
 '''
 x = [100, 200, 500]

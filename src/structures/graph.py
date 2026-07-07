@@ -94,7 +94,7 @@ def build_graph(x_arr, y_arr, ranges):
         g.nodes[i].y = y_arr[i]
         g.nodes[i].range = ranges[i]
 
-    for i in range(n):
+    for i in range(n): # add edge iff in range
         for j in range(i + 1, n):
             d = math.sqrt((x_arr[i] - x_arr[j])**2 + (y_arr[i] - y_arr[j])**2)
             if d <= ranges[i] and d <= ranges[j]: 

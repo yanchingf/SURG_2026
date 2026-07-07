@@ -394,7 +394,7 @@ Step 9 | Ω=(100, 8, 'Node')
     id=8 h=100 cluster=8 active=True
 Done at iteration 10
 
-[/Users/sophie/Desktop/Kovacs/kovacs_lab/src/tests/random-plots/20260703_030539](../src/tests/random-plots/20260703_030539)
+20260703_030539
 </details>
 
 

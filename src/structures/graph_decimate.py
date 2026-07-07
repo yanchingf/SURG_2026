@@ -47,7 +47,7 @@ def search(graph): # helper func for finding largest interaction
         if len(has_distance_edge) <= 0 and graph.nodes[node_id].range > curr[0]:
             curr = (graph.nodes[node_id].range, node_id, "Node")
 
-    if best_distance_edge[1] is not None:
+    if best_distance_edge[1] != None:
         return best_distance_edge
 
     return curr
@@ -123,3 +123,20 @@ def decimate(graph, obj):  # decimate node / edge
                 graph.remove_edge(v_id, k)
 
     return 
+
+
+def repair(graph):
+
+    n = len(graph.nodes)
+
+    for i in range(n): # repair edge iff in range
+        for j in range(i + 1, n):
+            
+            if in_range(graph, i, j) and (graph.nodes[j].active and graph.nodes[i].active):
+
+                d = math.sqrt((graph.nodes[i].x - graph.nodes[j].x)**2 + 
+                          (graph.nodes[i].y - graph.nodes[j].y)**2)
+                
+                graph.add_edge(i, j, d)
+           
+    return graph   

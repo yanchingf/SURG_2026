@@ -98,6 +98,6 @@ def build_graph(x_arr, y_arr, ranges):
         for j in range(i + 1, n):
             d = math.sqrt((x_arr[i] - x_arr[j])**2 + (y_arr[i] - y_arr[j])**2)
             if d <= ranges[i] and d <= ranges[j]: 
-                g.add_edge(i, j, d)
+                g.add_edge(i, j, 1/max(d, 1e-9))
            
     return g   

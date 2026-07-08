@@ -20,7 +20,7 @@ from src.data.random_test import generate_random_graph
 
 
 def plot_graph(g, points, n, iteration, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000,
-               output_dir=os.path.join(os.path.dirname(__file__), '..', 'tests', 'random-plots')):
+               output_dir=os.path.join(os.path.dirname(__file__), '..', 'tests','test-plots')):
     
     os.makedirs(output_dir, exist_ok=True)
 
@@ -57,6 +57,8 @@ def plot_graph(g, points, n, iteration, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_
                                       facecolor=color, alpha=0.08, zorder=0))
             ax.annotate(f"id={i}", (xx, yy), textcoords="offset points",
                     xytext=(5, 5), fontsize=7, color='black')
+            ax.annotate(f"cluster_id={g.nodes[i].cluster_id}", (xx, yy), textcoords="offset points",
+                    xytext=(5, 15), fontsize=5, color='black')
             ax.scatter(xx, yy, c=[color], s=40, zorder=3)
 
         else:
@@ -66,6 +68,8 @@ def plot_graph(g, points, n, iteration, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_
                                       facecolor="grey", alpha=0.08, zorder=0))
             ax.annotate(f"id={i}", (xx, yy), textcoords="offset points",
                     xytext=(5, 5), fontsize=7, color='black')
+            ax.annotate(f"cluster_id={g.nodes[i].cluster_id}", (xx, yy), textcoords="offset points",
+                    xytext=(5, 15), fontsize=5, color='black')
             ax.scatter(xx, yy, c="grey", s=40, zorder=3)
 
     ax.set_title(f"SDRG Step {iteration} | {n} nodes")
@@ -97,7 +101,7 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
     curr = search(g)
 
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = os.path.join(os.path.dirname(__file__), '..', 'tests', 'random-plots', run_id)
+    output_dir = os.path.join(os.path.dirname(__file__), '..', 'tests', 'test-plots', run_id)
 
     plot_graph(g, points, n, iteration=0, neg_x_lim=neg_x_lim, x_lim=x_lim, 
                neg_y_lim=neg_y_lim, y_lim=y_lim, output_dir=output_dir) # initial
@@ -123,34 +127,55 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
     return g
 
 '''
+x = [200, 400]
+y = [150, 150]
+r = [10, 10]
+'''
+
+'''
+x = [200, 400]
+y = [150, 150]
+r = [250, 250]
+'''
+'''
+x = [100, 300]
+y = [200, 200]
+r = [200, 200]
+'''
+
+'''
 x = [100, 200, 300, 100, 200, 300, 100, 200, 300]
 y = [100, 200, 300, 200, 100, 200, 300, 300, 100]
-r = [75, 300, 75, 75, 100, 100, 75, 75, 75]
+r = [150, 300, 10, 150, 150, 10, 10, 10, 10]
 '''
 
 '''
-x = [200, 300, 400]
-y = [200, 200, 200]
-r = [300, 300, 300]
+x = [100, 200, 300, 100, 200, 300, 100, 200, 300]
+y = [100, 200, 300, 200, 100, 200, 300, 300, 100]
+r = [150, 400, 150, 10, 10, 10, 150, 10, 150]
 '''
 
 '''
-x = [200, 400]
-y = [200, 200]
-r = [10, 300]
+x = [100, 150, 240, 290]
+y = [200, 200, 200, 200]
+r = [100, 60, 100, 60]
 '''
 
 '''
-x = [200, 400]
-y = [200, 200]
-r = [300, 300]
+x = [100, 150, 240, 290]
+y = [200, 200, 200, 200]
+r = [60, 60, 100, 60]
 '''
 
+'''
+x = [100, 200, 300, 300]
+y = [100, 100, 100, 300]
+r = [120, 120, 120, 250]
+'''
 
-x = [0, 100, 280]
-y = [200, 200, 200]
-r = [150, 150, 150]
-
+x = [200, 400, 200, 400]
+y = [200, 200, 400, 400]
+r = [250, 250, 250, 250]
 
 '''
 x = [100, 200, 500]
@@ -164,4 +189,31 @@ y = [100, 100, 186.6]
 r = [110, 110, 110]
 '''
 
-run_sdrg(5, 0, 1000, 0, 1000, False, (x, y, r))
+'''
+x = [99, 100, 200]
+y = [300, 300, 300]
+r = [99, 99, 199]
+'''
+
+'''
+x = [200, 300, 400]
+y = [200, 200, 200]
+r = [300, 300, 300]
+'''
+
+'''
+x = [100, 400, 700]
+y = [200, 200, 200]
+r = [350, 350, 350]
+'''
+
+'''
+x = [300, 100, 300, 500, 300]
+y = [300, 300, 100, 300, 500]
+r = [210, 210, 210, 210, 210]
+'''
+
+
+
+
+run_sdrg(5, 0, 750, 0, 750, False, (x, y, r))

@@ -1,4 +1,6 @@
 
+TO BE UPDATED (testcases in sdrg.py)
+
 Two nodes, one in range, other out
 
 x = [200, 400]

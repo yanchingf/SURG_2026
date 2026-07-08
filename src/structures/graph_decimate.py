@@ -100,10 +100,6 @@ def decimate(graph, obj):  # decimate node / edge
         else:
             new_traverse = u.range # negative safeguard
 
-        print(f"  Edge decimate: u={u.id} (cluster={u.cluster_id}) v={v.id} (cluster={v.cluster_id})")
-        print(f"  in_range check: {in_range(graph, u.id, v.id)}")
-        print(f"  adj weight: {graph.adj[u.id][v.id]}")
-
         for k in range(graph.length):
             if not (k == u.id or k == v_id):
                 best = max(graph.adj[u.id][k], graph.adj[v_id][k])
@@ -133,10 +129,11 @@ def repair(graph):
         for j in range(i + 1, n):
             
             if in_range(graph, i, j) and (graph.nodes[j].active and graph.nodes[i].active):
+                if graph.adj[i][j] == 0:
 
-                d = math.sqrt((graph.nodes[i].x - graph.nodes[j].x)**2 + 
-                          (graph.nodes[i].y - graph.nodes[j].y)**2)
+                    d = math.sqrt((graph.nodes[i].x - graph.nodes[j].x)**2 + 
+                            (graph.nodes[i].y - graph.nodes[j].y)**2)
                 
-                graph.add_edge(i, j, d)
+                    graph.add_edge(i, j, 1/max(d, 1e-9))
            
     return graph   

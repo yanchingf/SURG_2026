@@ -8,11 +8,11 @@ import math
 import random
 from src.structures.graph import Graph
 
+import numpy as np
 
 def in_range(graph, u, v):
 
-    d = math.sqrt((graph.nodes[u].x - graph.nodes[v].x)**2 + 
-                  (graph.nodes[u].y - graph.nodes[v].y)**2)
+    d = np.linalg.norm(graph.nodes[u].pos - graph.nodes[v].pos)
     return d <= graph.nodes[u].range and d <= graph.nodes[v].range
 
 
@@ -37,6 +37,12 @@ def search(graph): # helper func for finding largest interaction
                     if in_range(graph, node_id, v):
                         if weight > best_distance_edge[0]: # distance based edges should have priority
                             best_distance_edge = (weight, (node_id, v), "Edge")
+                        elif weight == best_distance_edge[0]: # prioritize brighter edge cover if same 1/d
+                            curr_brightness = graph.nodes[node_id].range + graph.nodes[v].range
+                            best_u, best_v = best_distance_edge[1]
+                            best_brightness = graph.nodes[best_u].range + graph.nodes[best_v].range
+                            if curr_brightness > best_brightness:
+                                best_distance_edge = (weight, (node_id, v), "Edge")
                     else:
                         if weight > curr[0]: # new edges compete with nodes based on literal value
                             curr = (weight, (node_id, v), "Edge")
@@ -131,8 +137,7 @@ def repair(graph):
             if in_range(graph, i, j) and (graph.nodes[j].active and graph.nodes[i].active):
                 if graph.adj[i][j] == 0:
 
-                    d = math.sqrt((graph.nodes[i].x - graph.nodes[j].x)**2 + 
-                            (graph.nodes[i].y - graph.nodes[j].y)**2)
+                    d = np.linalg.norm(graph.nodes[i].pos - graph.nodes[j].pos)
                 
                     graph.add_edge(i, j, 1/max(d, 1e-9))
            

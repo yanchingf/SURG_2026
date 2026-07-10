@@ -11,11 +11,11 @@ import matplotlib.cm as cm
 import matplotlib.patches as mpatches
 from datetime import datetime
 
-from graph import Graph
-from graph import build_graph
-from graph_decimate import decimate
-from graph_decimate import search
-from graph_decimate import repair
+from structures.graph import Graph
+from structures.graph import build_graph
+from structures.graph_decimate import decimate
+from structures.graph_decimate import search
+from structures.graph_decimate import repair
 from src.data.random_test import generate_random_graph
 
 
@@ -48,29 +48,18 @@ def plot_graph(g, points, n, iteration, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_
                 
 
     for i in range(n): # add radius and nodes
-        if g.nodes[i].active:
-            xx, yy = points[0][i], points[1][i]
-            rr = g.nodes[i].range
-            color = cm.tab10(g.nodes[i].cluster_id % 10)
+        xx, yy = points[0][i], points[1][i]
+        rr = g.nodes[i].range
+        color = cm.tab10(g.nodes[i].cluster_id % 10 if g.nodes[i].active else "gray")
 
-            ax.add_patch(mpatches.Circle((xx, yy), radius=rr, fill=True,
-                                      facecolor=color, alpha=0.08, zorder=0))
-            ax.annotate(f"id={i}", (xx, yy), textcoords="offset points",
-                    xytext=(5, 5), fontsize=7, color='black')
-            ax.annotate(f"cluster_id={g.nodes[i].cluster_id}", (xx, yy), textcoords="offset points",
-                    xytext=(5, 15), fontsize=5, color='black')
-            ax.scatter(xx, yy, c=[color], s=40, zorder=3)
+        ax.add_patch(mpatches.Circle((xx, yy), radius=rr, fill=True,
+                                    facecolor=color, alpha=0.08, zorder=0))
+        ax.annotate(f"id={i}", (xx, yy), textcoords="offset points",
+                xytext=(5, 5), fontsize=7, color='black')
+        ax.annotate(f"cluster_id={g.nodes[i].cluster_id}", (xx, yy), textcoords="offset points",
+                xytext=(5, 15), fontsize=5, color='black')
+        ax.scatter(xx, yy, c=[color], s=40, zorder=3)
 
-        else:
-            xx, yy = points[0][i], points[1][i]
-            rr = g.nodes[i].range
-            ax.add_patch(mpatches.Circle((xx, yy), radius=rr, fill=True,
-                                      facecolor="grey", alpha=0.08, zorder=0))
-            ax.annotate(f"id={i}", (xx, yy), textcoords="offset points",
-                    xytext=(5, 5), fontsize=7, color='black')
-            ax.annotate(f"cluster_id={g.nodes[i].cluster_id}", (xx, yy), textcoords="offset points",
-                    xytext=(5, 15), fontsize=5, color='black')
-            ax.scatter(xx, yy, c="grey", s=40, zorder=3)
 
     ax.set_title(f"SDRG Step {iteration} | {n} nodes")
     ax.set_xlim(neg_x_lim, x_lim)
@@ -92,7 +81,7 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
             print("INPUT REQUIRED")
             return
         
-        g = build_graph(inp[0], inp[1], inp[2])
+        g = build_graph((inp[0], inp[1]), inp[2])
         points = (inp[0], inp[1])
         n = len(inp[0])
 
@@ -122,98 +111,6 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
         curr = repair(g)
         curr = search(g)
 
-
     print(f"Done at iteration {iteration}, plots saved to '{output_dir}/'")
     return g
 
-'''
-x = [200, 400]
-y = [150, 150]
-r = [10, 10]
-'''
-
-'''
-x = [200, 400]
-y = [150, 150]
-r = [250, 250]
-'''
-'''
-x = [100, 300]
-y = [200, 200]
-r = [200, 200]
-'''
-
-'''
-x = [100, 200, 300, 100, 200, 300, 100, 200, 300]
-y = [100, 200, 300, 200, 100, 200, 300, 300, 100]
-r = [150, 300, 10, 150, 150, 10, 10, 10, 10]
-'''
-
-'''
-x = [100, 200, 300, 100, 200, 300, 100, 200, 300]
-y = [100, 200, 300, 200, 100, 200, 300, 300, 100]
-r = [150, 400, 150, 10, 10, 10, 150, 10, 150]
-'''
-
-'''
-x = [100, 150, 240, 290]
-y = [200, 200, 200, 200]
-r = [100, 60, 100, 60]
-'''
-
-'''
-x = [100, 150, 240, 290]
-y = [200, 200, 200, 200]
-r = [60, 60, 100, 60]
-'''
-
-'''
-x = [100, 200, 300, 300]
-y = [100, 100, 100, 300]
-r = [120, 120, 120, 250]
-'''
-
-x = [200, 400, 200, 400]
-y = [200, 200, 400, 400]
-r = [250, 250, 250, 250]
-
-'''
-x = [100, 200, 500]
-y = [100, 100, 100]
-r = [110, 110, 110]
-'''
-
-'''
-x = [100, 200, 150]
-y = [100, 100, 186.6]
-r = [110, 110, 110]
-'''
-
-'''
-x = [99, 100, 200]
-y = [300, 300, 300]
-r = [99, 99, 199]
-'''
-
-'''
-x = [200, 300, 400]
-y = [200, 200, 200]
-r = [300, 300, 300]
-'''
-
-'''
-x = [100, 400, 700]
-y = [200, 200, 200]
-r = [350, 350, 350]
-'''
-
-'''
-x = [300, 100, 300, 500, 300]
-y = [300, 300, 100, 300, 500]
-r = [210, 210, 210, 210, 210]
-'''
-
-
-
-
-run_sdrg(5, 0, 750, 0, 750, False, (x, y, r))

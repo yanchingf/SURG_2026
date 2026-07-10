@@ -2,16 +2,23 @@
 import heapq
 import math
 
+import numpy as np
+from astropy.coordinates import SkyCoord
+
+
 class Node:
 
-    def __init__(self, range=0, active=True, id=-1, cluster_id=-2, x=0, y=0):
+    def __init__(self, range=0, active=True, id=-1, cluster_id=-2, not_2d=False, coords=None):
         
         self.range = range
         self.id = id
         self.cluster_id = cluster_id
         self.active = active
-        self.x = x
-        self.y = y
+
+        if len(coords) != 0:
+            self.pos = coords
+        else:
+            print("ERROR: coords needed in declaration")
 
     def __repr__(self):
 
@@ -83,21 +90,23 @@ class Graph:
 
         return distances
 
+# update to be more general— extend to 3D points
+def build_graph(points, ranges):
 
-def build_graph(x_arr, y_arr, ranges):
-
-    n = len(x_arr)
+    points = np.asarray(points, dtype=float)
+    ranges = np.asarray(ranges, dtype=float)
+    n = points.shape[0]
     g = Graph(n)
-    
+
     for i in range(n):
-        g.nodes[i].x = x_arr[i]
-        g.nodes[i].y = y_arr[i]
+        g.nodes[i].pos = points[i]
         g.nodes[i].range = ranges[i]
 
-    for i in range(n): # add edge iff in range
+    for i in range(n):
         for j in range(i + 1, n):
-            d = math.sqrt((x_arr[i] - x_arr[j])**2 + (y_arr[i] - y_arr[j])**2)
-            if d <= ranges[i] and d <= ranges[j]: 
+            d = np.linalg.norm(points[i] - points[j])
+            if d <= ranges[i] and d <= ranges[j]:
                 g.add_edge(i, j, 1/max(d, 1e-9))
-           
-    return g   
+
+    return g
+ 

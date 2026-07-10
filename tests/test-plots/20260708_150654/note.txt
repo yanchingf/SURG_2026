@@ -1,0 +1,2 @@
+
+post brightness metric update

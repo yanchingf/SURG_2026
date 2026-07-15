@@ -19,7 +19,6 @@ from structures.graph_decimate import search
 from structures.graph_decimate import repair
 from src.data.random_test import generate_random_graph
 
-import skyfield
 from astropy import units as u
 from astropy.coordinates import Angle
 
@@ -27,6 +26,7 @@ from astropy.coordinates import Angle
 df = parse_star_data()
 save_processed_data(df)
 '''
+
 def star_to_graph_mapping(skycoords): # need to update per iteration
 
     t = get_coords_and_brightness(skycoords)

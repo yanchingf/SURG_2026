@@ -69,7 +69,7 @@ def plot_graph(g, points, n, iteration, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_
     plt.close(fig)
 
 
-def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True, inp=None):
+def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True, inp=None, percolation_stats=False):
 
     if random:
         obj = generate_random_graph(n, neg_x_lim, x_lim, neg_y_lim, y_lim)
@@ -90,10 +90,16 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
     curr = search(g)
 
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = os.path.join(os.path.dirname(__file__), '..', 'tests', 'test-plots', run_id)
+    output_dir = os.path.join(os.path.dirname(__file__), '..', 'tests', 'test-plots', run_id, percolation_stats=False)
 
     plot_graph(g, points, n, iteration=0, neg_x_lim=neg_x_lim, x_lim=x_lim, 
                neg_y_lim=neg_y_lim, y_lim=y_lim, output_dir=output_dir) # initial
+    
+    # write percolation stats
+    # file:///D:/Profiles/shd3156/Downloads/9781315274386_previewpdf%20(1)%20(1).pdf
+    # https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html
+
+
 
 
     while curr[1] != None:
@@ -110,6 +116,10 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
 
         curr = repair(g)
         curr = search(g)
+
+    if percolation_stats == True:
+        stat_output_dir = os.path.join(os.path.dirname(__file__), '..', 'tests', 'percolation-plots', run_id, percolation_stats=False)
+        
 
     print(f"Done at iteration {iteration}, plots saved to '{output_dir}/'")
     return g

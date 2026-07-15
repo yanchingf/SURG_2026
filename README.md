@@ -1,13 +1,17 @@
 
 ## SURG Project 2026
 # Description
+tbd
 
-# Graph Utilities
 | File| Description |
 |----------|----------|
-| graph.py  | Current graph  |
+| graph.py  | Graph base file |
 | graph_decimate.py  | Decimates max node edge based on distance and brightness calculation  |
-| sdrg.py  | Full SDRG on graph until no more decimations can be performed |
+| sdrg.py  | Full SDRG on graph and visualization utilities |
 | random_test.py  | Random test utilities |
 
-# Star Utilities
+| star_io.py  | YBCS I/O file  |
+| stars.py  | Other star utilities for creating patches  |
+
+
+

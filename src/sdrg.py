@@ -38,8 +38,10 @@ def plot_graph(g, points, n, iteration, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_
         # need scaling for neg min size?
         sizes.append(max(0.001, g.nodes[i].range))
 
+
     for i in range(n):
         if g.nodes[i].active:
+            num_cluster = max(num_cluster, g.nodes[i].cluster_id + 1)
             for j in range(i+1, n):
                 if g.nodes[j].active and g.adj[i][j] > 0:
                     plt.plot([points[0][i], points[0][j]],
@@ -90,17 +92,14 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
     curr = search(g)
 
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = os.path.join(os.path.dirname(__file__), '..', 'tests', 'test-plots', run_id, percolation_stats=False)
+    output_dir = os.path.join(os.path.dirname(__file__), '..', 'tests', 'test-plots', run_id)
 
     plot_graph(g, points, n, iteration=0, neg_x_lim=neg_x_lim, x_lim=x_lim, 
-               neg_y_lim=neg_y_lim, y_lim=y_lim, output_dir=output_dir) # initial
-    
-    # write percolation stats
-    # file:///D:/Profiles/shd3156/Downloads/9781315274386_previewpdf%20(1)%20(1).pdf
-    # https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html
+               neg_y_lim=neg_y_lim, y_lim=y_lim, output_dir=output_dir, percolation_stats=percolation_stats) # initial
 
 
-
+    n_clusters = []
+    max_sizes = []
 
     while curr[1] != None:
 
@@ -117,8 +116,32 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
         curr = repair(g)
         curr = search(g)
 
+        if percolation_stats == True:
+            n_clusters.append(len(g.group_ids))
+            max_sizes.append(max(len(i) for i in g.group_ids))
+
+
     if percolation_stats == True:
-        stat_output_dir = os.path.join(os.path.dirname(__file__), '..', 'tests', 'percolation-plots', run_id, percolation_stats=False)
+
+        stat_output_dir = os.path.join(os.path.dirname(__file__), '..', 'tests', 'percolation-plots', run_id)
+
+        num_cluster_plt = plt.figure()
+        num_cluster_plt.plot(range(iteration), n_clusters, marker='o', linestyle='-', color='b')
+        num_cluster_plt.title("Number of Clusters by Iteration")
+        num_cluster_plt.xlabel("Iteration Number")
+        num_cluster_plt.ylabel("Number of Clusters")
+        num_cluster_plt.savefig(os.path.join(stat_output_dir, "num_cluster_plt"))
+
+        max_cluster_size_plt = plt.figure()
+        max_cluster_size_plt.plot(range(iteration), max_sizes, marker="o", linestyle='-', color='r')
+        max_cluster_size_plt.title("Max Size of Cluster by Iteration")
+        max_cluster_size_plt.xlabel("Iteration Number")
+        max_cluster_size_plt.ylabel("Max Size of Cluster")
+        max_cluster_size_plt.savefig(os.path.join(stat_output_dir, "max_cluster_size_plt"))
+
+        cluster_size_distro_plt = plt.figure(os.join.path())
+
+        
         
 
     print(f"Done at iteration {iteration}, plots saved to '{output_dir}/'")

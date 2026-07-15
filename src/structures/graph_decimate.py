@@ -84,8 +84,6 @@ def decimate(graph, obj):  # decimate node / edge
                 new_strength = max(graph.adj[ni][nj], J_ij * J_ik / node_range)
                 graph.adj[ni][nj] = new_strength
                 graph.adj[nj][ni] = new_strength
-
-                print(f"Updated edges between {ni} and {nj}")
                 
         graph.set_node_status(node_id, False)
 

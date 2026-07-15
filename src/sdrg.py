@@ -93,19 +93,20 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
 
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_dir = os.path.join(os.path.dirname(__file__), '..', 'tests', 'test-plots', run_id)
+    txt_f = os.path.join(output_dir, "log.txt")
 
     plot_graph(g, points, n, iteration=0, neg_x_lim=neg_x_lim, x_lim=x_lim, 
                neg_y_lim=neg_y_lim, y_lim=y_lim, output_dir=output_dir, percolation_stats=percolation_stats) # initial
-
 
     n_clusters = []
     max_sizes = []
 
     while curr[1] != None:
 
-        print(f"Step {iteration} | Ω={curr}") # print log
-        for i in range(n):
-            print(f"    id={g.nodes[i].id} h={g.nodes[i].range} cluster={g.nodes[i].cluster_id} active={g.nodes[i].active}")
+        with open(txt_f) as f:
+            f.write(f"Step {iteration} | Ω={curr}\n") # write log
+            for i in range(n):
+                f.write(f"    id={g.nodes[i].id} h={g.nodes[i].range} cluster={g.nodes[i].cluster_id} active={g.nodes[i].active}\n")
 
         decimate(g, curr)
         plot_graph(g, points, n, iteration, neg_x_lim=neg_x_lim, x_lim=x_lim,
@@ -139,11 +140,18 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
         max_cluster_size_plt.ylabel("Max Size of Cluster")
         max_cluster_size_plt.savefig(os.path.join(stat_output_dir, "max_cluster_size_plt"))
 
+        max_cluster_v_num_cluster = plt.figure()
+        max_cluster_v_num_cluster.plot(n_clusters, max_sizes, marker="o", linestyle='-', color='r')
+        max_cluster_v_num_cluster.title("Max Size of Cluster by Iteration")
+        max_cluster_v_num_cluster.xlabel("Number of Clusters")
+        max_cluster_v_num_cluster.ylabel("Max Size of Cluster")
+        max_cluster_v_num_cluster.savefig(os.path.join(stat_output_dir, "max_cluster_v_num_cluster_plt"))
+
         cluster_size_distro_plt = plt.figure(os.join.path())
+        max_cluster_size_plt.savefig(os.path.join(stat_output_dir, "cluster_distro_size_plt"))
 
-        
-        
+    with open(txt_f) as f:
+        f.write(f"Done at iteration {iteration}, plots saved to '{output_dir}/'\n")
 
-    print(f"Done at iteration {iteration}, plots saved to '{output_dir}/'")
     return g
 

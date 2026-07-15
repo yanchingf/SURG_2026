@@ -90,7 +90,7 @@ class Graph:
 
         return distances
 
-# update to be more general— extend to 3D points
+
 def build_graph(points, ranges):
 
     points = np.asarray(points, dtype=float)

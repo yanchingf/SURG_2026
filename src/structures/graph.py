@@ -5,6 +5,7 @@ import math
 import numpy as np
 from astropy.coordinates import SkyCoord
 
+from collections import defaultdict
 
 class Node:
 
@@ -31,7 +32,7 @@ class Graph:
 
         self.nodes = {i: Node(id=i, cluster_id=i) for i in range(n)}
         self.adj = [[0]*n for i in range(n)] # full adj matrix
-        self.group_ids = {i: [i] for i in range(n)} # each in own cluster originally
+        self.group_ids = defaultdict({i: [i] for i in range(n)}) # each in own cluster originally
 
         self.length = n
 
@@ -60,8 +61,10 @@ class Graph:
     def merge_clusters(self, head, other):
 
         to_change = self.get_cluster_members(other)
+        changed_id = self.nodes[0].cluster_id
         for i in to_change:
             self.nodes[i].cluster_id = self.nodes[head].cluster_id
+        self.group_ids.remove_key(changed_id)
 
     def djikstra(self, id):
 

@@ -131,12 +131,12 @@ def repair(graph):
 
     for i in range(n): # repair edge iff in range
         for j in range(i + 1, n):
-            
+
             if in_range(graph, i, j) and (graph.nodes[j].active and graph.nodes[i].active):
+
                 if graph.adj[i][j] == 0:
 
                     d = np.linalg.norm(graph.nodes[i].pos - graph.nodes[j].pos)
-                
                     graph.add_edge(i, j, 1/max(d, 1e-9))
            
     return graph   

@@ -18,6 +18,8 @@ from structures.graph_decimate import search
 from structures.graph_decimate import repair
 from src.data.random_test import generate_random_graph
 
+from collections import Counter
+
 
 def plot_graph(g, points, n, iteration, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000,
                output_dir=os.path.join(os.path.dirname(__file__), '..', 'tests','test-plots')):
@@ -100,6 +102,7 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
 
     n_clusters = []
     max_sizes = []
+    size_distro = []
 
     while curr[1] != None:
 
@@ -120,34 +123,40 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
         if percolation_stats == True:
             n_clusters.append(len(g.group_ids))
             max_sizes.append(max(len(i) for i in g.group_ids))
+            group_sizes = [len(cluster) for cluster in g.group_ids]
+            size_distro.append(Counter(group_sizes))
 
 
     if percolation_stats == True:
 
         stat_output_dir = os.path.join(os.path.dirname(__file__), '..', 'tests', 'percolation-plots', run_id)
+        os.makedirs(stat_output_dir, exist_ok=True)
 
-        num_cluster_plt = plt.figure()
-        num_cluster_plt.plot(range(iteration), n_clusters, marker='o', linestyle='-', color='b')
-        num_cluster_plt.title("Number of Clusters by Iteration")
-        num_cluster_plt.xlabel("Iteration Number")
-        num_cluster_plt.ylabel("Number of Clusters")
-        num_cluster_plt.savefig(os.path.join(stat_output_dir, "num_cluster_plt"))
+        fig, ax = plt.subplots()
+        ax.plot(range(iteration), n_clusters, marker='o', linestyle='-', color='b')
+        ax.set_title("Number of Clusters by Iteration")
+        ax.set_xlabel("Iteration Number")
+        ax.set_ylabel("Number of Clusters")
+        fig.savefig(os.path.join(stat_output_dir, "num_cluster_plt.png"))
+        plt.close(fig)
 
-        max_cluster_size_plt = plt.figure()
-        max_cluster_size_plt.plot(range(iteration), max_sizes, marker="o", linestyle='-', color='r')
-        max_cluster_size_plt.title("Max Size of Cluster by Iteration")
-        max_cluster_size_plt.xlabel("Iteration Number")
-        max_cluster_size_plt.ylabel("Max Size of Cluster")
-        max_cluster_size_plt.savefig(os.path.join(stat_output_dir, "max_cluster_size_plt"))
+        fig, ax = plt.subplots()
+        ax.plot(range(iteration), max_sizes, marker="o", linestyle='-', color='r')
+        ax.set_title("Max Size of Cluster by Iteration")
+        ax.set_xlabel("Iteration Number")
+        ax.set_ylabel("Max Size of Cluster")
+        fig.savefig(os.path.join(stat_output_dir, "max_cluster_size_plt.png"))
+        plt.close(fig)
 
-        max_cluster_v_num_cluster = plt.figure()
-        max_cluster_v_num_cluster.plot(n_clusters, max_sizes, marker="o", linestyle='-', color='r')
-        max_cluster_v_num_cluster.title("Max Size of Cluster by Iteration")
-        max_cluster_v_num_cluster.xlabel("Number of Clusters")
-        max_cluster_v_num_cluster.ylabel("Max Size of Cluster")
-        max_cluster_v_num_cluster.savefig(os.path.join(stat_output_dir, "max_cluster_v_num_cluster_plt"))
+        fig, ax = plt.subplots()
+        ax.plot(n_clusters, max_sizes, marker="o", linestyle='-', color='r')
+        ax.set_title("Max Cluster Size vs Number of Clusters")
+        ax.set_xlabel("Number of Clusters")
+        ax.set_ylabel("Max Size of Cluster")
+        fig.savefig(os.path.join(stat_output_dir, "max_cluster_v_num_cluster_plt.png"))
+        plt.close(fig)
 
-        cluster_size_distro_plt = plt.figure(os.join.path())
+        cluster_size_distro_plt = plt.figure()
         max_cluster_size_plt.savefig(os.path.join(stat_output_dir, "cluster_distro_size_plt"))
 
     with open(txt_f) as f:

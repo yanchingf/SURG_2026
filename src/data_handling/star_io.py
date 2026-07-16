@@ -7,6 +7,7 @@ from astropy.io import ascii
 from astropy.table import Table
 from astropy.coordinates import SkyCoord
 import astropy.units as u
+from astropy.coordinates import get_constellation
 
 # via bright star catalogue docs
 catalogue_fields = [ 
@@ -103,10 +104,16 @@ def save_processed_data(df, filename="stars.csv"):
 
     print(f"Saved processed data to {output_path}")
 
+def get_patch(df, constellation, short_name=True):
+    
+    coords, brightness = get_coords_and_brightness(df)
+    names = get_constellation(coords, short_name=short_name)
+    mask = np.array(names) == constellation
+    return df[mask].reset_index(drop=True)
 
 def get_all_star_data():
 
     df = parse_star_data()
-    return see_table(df)
+    return df
 
 

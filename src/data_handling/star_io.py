@@ -71,7 +71,7 @@ def see_table(df, n=20): # display as astropy table
     return table
 
 
-def get_coords_and_brightness(df, c=1): # convert RA / Dec => cartesian coords & vamag to brightness
+def get_coords_and_brightness(df, c=1): # convert RA / Dec => numeric cartesian coords & Vmag to brightness
 
     ra = (df["RAh"].to_numpy(dtype=float)
         + df["RAm"].to_numpy(dtype=float) / 60
@@ -84,11 +84,14 @@ def get_coords_and_brightness(df, c=1): # convert RA / Dec => cartesian coords &
             + df["DEm"].to_numpy(dtype=float) / 60
             + df["DEs"].to_numpy(dtype=float) / 3600)) * u.deg
 
-    coords = SkyCoord(ra=ra, dec=dec, frame="icrs")
+    sky_coords = SkyCoord(ra=ra, dec=dec, frame="icrs")
+    ra_deg = sky_coords.ra.to_value(u.deg)
+    dec_deg = sky_coords.dec.to_value(u.deg)
+    coords = np.column_stack((ra_deg, dec_deg))
 
     brightness = ((7.0-df["Vmag"])*c).to_numpy(dtype=float)
 
-    return (coords, brightness)
+    return (coords, brightness, sky_coords)
 
 
 def save_processed_data(df, filename="stars.csv"):
@@ -102,12 +105,22 @@ def save_processed_data(df, filename="stars.csv"):
     output_path = os.path.join(output_dir, filename)
     df.to_csv(output_path, index=False)
 
-    print(f"Saved processed data to {output_path}")
+    print(f"Saved processed data to log.")
 
 def get_patch(df, constellation, short_name=True):
-    
-    coords, brightness = get_coords_and_brightness(df)
-    names = get_constellation(coords, short_name=short_name)
+
+    ra = (df["RAh"].to_numpy(dtype=float)
+        + df["RAm"].to_numpy(dtype=float) / 60
+        + df["RAs"].to_numpy(dtype=float) / 3600) * u.hourangle
+
+    dec_sign = np.where(df["DE_sign"] == "-", -1.0, 1.0)
+    dec = (dec_sign * (
+            df["DEd"].to_numpy(dtype=float)
+            + df["DEm"].to_numpy(dtype=float) / 60
+            + df["DEs"].to_numpy(dtype=float) / 3600)) * u.deg
+
+    sky_coords = SkyCoord(ra=ra, dec=dec, frame="icrs")
+    names = get_constellation(sky_coords, short_name=short_name)
     mask = np.array(names) == constellation
     return df[mask].reset_index(drop=True)
 

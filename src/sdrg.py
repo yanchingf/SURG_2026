@@ -16,7 +16,8 @@ from structures.graph import build_graph
 from structures.graph_decimate import decimate
 from structures.graph_decimate import search
 from structures.graph_decimate import repair
-from src.data.random_test import generate_random_graph
+
+from src.data_handling.random_test import generate_random_graph
 
 from collections import Counter
 
@@ -27,6 +28,7 @@ def plot_graph(g, points, n, iteration, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_
     os.makedirs(output_dir, exist_ok=True)
 
     x, y, colors, sizes = [], [], [], []
+    num_cluster = 0
 
     fig, ax = plt.subplots()
 
@@ -54,7 +56,7 @@ def plot_graph(g, points, n, iteration, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_
     for i in range(n): # add radius and nodes
         xx, yy = points[0][i], points[1][i]
         rr = g.nodes[i].range
-        color = cm.tab10(g.nodes[i].cluster_id % 10 if g.nodes[i].active else "gray")
+        color = cm.tab10(g.nodes[i].cluster_id % 10) if g.nodes[i].active else "gray"
 
         ax.add_patch(mpatches.Circle((xx, yy), radius=rr, fill=True,
                                     facecolor=color, alpha=0.08, zorder=0))
@@ -73,7 +75,9 @@ def plot_graph(g, points, n, iteration, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_
     plt.close(fig)
 
 
-def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True, inp=None, percolation_stats=False):
+def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True, inp=None, percolation_stats=False, 
+             output_dir=os.path.join(os.path.dirname(__file__), '..', 'tests','runs')):
+    
 
     if random:
         obj = generate_random_graph(n, neg_x_lim, x_lim, neg_y_lim, y_lim)
@@ -93,12 +97,15 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
     
     curr = search(g)
 
-    run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = os.path.join(os.path.dirname(__file__), '..', 'tests', 'test-plots', run_id)
+    step_plot_dir = os.path.join(output_dir, "steps")
+    stat_output_dir = os.path.join(output_dir, "percolation")
     txt_f = os.path.join(output_dir, "log.txt")
 
+    os.makedirs(step_plot_dir, exist_ok=True)
+    os.makedirs(stat_output_dir, exist_ok=True)
+
     plot_graph(g, points, n, iteration=0, neg_x_lim=neg_x_lim, x_lim=x_lim, 
-               neg_y_lim=neg_y_lim, y_lim=y_lim, output_dir=output_dir, percolation_stats=percolation_stats) # initial
+               neg_y_lim=neg_y_lim, y_lim=y_lim, output_dir=step_plot_dir) # initial
 
     n_clusters = []
     max_sizes = []
@@ -106,14 +113,14 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
 
     while curr[1] != None:
 
-        with open(txt_f) as f:
+        with open(txt_f, "a", encoding="utf-8") as f:
             f.write(f"Step {iteration} | Ω={curr}\n") # write log
             for i in range(n):
                 f.write(f"    id={g.nodes[i].id} h={g.nodes[i].range} cluster={g.nodes[i].cluster_id} active={g.nodes[i].active}\n")
 
         decimate(g, curr)
         plot_graph(g, points, n, iteration, neg_x_lim=neg_x_lim, x_lim=x_lim,
-           neg_y_lim=neg_y_lim, y_lim=y_lim, output_dir=output_dir)
+           neg_y_lim=neg_y_lim, y_lim=y_lim, output_dir=step_plot_dir)
 
         iteration += 1
 
@@ -121,19 +128,15 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
         curr = search(g)
 
         if percolation_stats == True:
-            n_clusters.append(len(g.group_ids))
-            max_sizes.append(max(len(i) for i in g.group_ids))
-            group_sizes = [len(cluster) for cluster in g.group_ids]
+            group_sizes = [len(members) for members in g.group_ids.values()]
+            n_clusters.append(len(group_sizes))
+            max_sizes.append(max(group_sizes) if group_sizes else 0)
             size_distro.append(Counter(group_sizes))
-
 
     if percolation_stats == True:
 
-        stat_output_dir = os.path.join(os.path.dirname(__file__), '..', 'tests', 'percolation-plots', run_id)
-        os.makedirs(stat_output_dir, exist_ok=True)
-
         fig, ax = plt.subplots()
-        ax.plot(range(iteration), n_clusters, marker='o', linestyle='-', color='b')
+        ax.plot(range(len(n_clusters)), n_clusters, marker='o', linestyle='-', color='b')
         ax.set_title("Number of Clusters by Iteration")
         ax.set_xlabel("Iteration Number")
         ax.set_ylabel("Number of Clusters")
@@ -141,7 +144,7 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
         plt.close(fig)
 
         fig, ax = plt.subplots()
-        ax.plot(range(iteration), max_sizes, marker="o", linestyle='-', color='r')
+        ax.plot(range(len(max_sizes)), max_sizes, marker="o", linestyle='-', color='r')
         ax.set_title("Max Size of Cluster by Iteration")
         ax.set_xlabel("Iteration Number")
         ax.set_ylabel("Max Size of Cluster")
@@ -156,10 +159,22 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
         fig.savefig(os.path.join(stat_output_dir, "max_cluster_v_num_cluster_plt.png"))
         plt.close(fig)
 
-        cluster_size_distro_plt = plt.figure()
-        max_cluster_size_plt.savefig(os.path.join(stat_output_dir, "cluster_distro_size_plt"))
+        fig, ax = plt.subplots()
+        sample_idxs = range(0, len(size_distro), max(1, len(size_distro) // 5))
+        for idx in sample_idxs:
+            counts = size_distro[idx]
+            if counts != None:
+                xs = sorted(counts.keys())
+                ys = [counts[x] for x in xs]
+                ax.plot(xs, ys, marker='o', ms=3, label=f"iter={idx + 1}")
+        ax.set_title("Cluster Size Distribution")
+        ax.set_xlabel("Cluster size")
+        ax.set_ylabel("Count of clusters with that size")
+        ax.legend(fontsize=7)
+        fig.savefig(os.path.join(stat_output_dir, "cluster_distro_size_plt.png"))
+        plt.close(fig)
 
-    with open(txt_f) as f:
+    with open(txt_f, "a", encoding="utf-8") as f:
         f.write(f"Done at iteration {iteration}, plots saved to '{output_dir}/'\n")
 
     return g

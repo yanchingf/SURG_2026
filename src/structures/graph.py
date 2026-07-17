@@ -9,17 +9,17 @@ from collections import defaultdict
 
 class Node:
 
-    def __init__(self, range=0, active=True, id=-1, cluster_id=-2, not_2d=False, coords=None):
+    def __init__(self, range=0, active=True, id=-1, cluster_id=-2, coords=None):
         
         self.range = range
         self.id = id
         self.cluster_id = cluster_id
         self.active = active
 
-        if len(coords) != 0:
+        if coords is not None:
             self.pos = coords
         else:
-            print("ERROR: coords needed in declaration")
+            print("Coords needed in declaration")
 
     def __repr__(self):
 
@@ -28,12 +28,16 @@ class Node:
         
 class Graph:
 
-    def __init__(self, n):
+    def __init__(self, n, coords=None):
 
-        self.nodes = {i: Node(id=i, cluster_id=i) for i in range(n)}
+        if coords is None:
+            coords = [None] * n
+
+        self.nodes = {i: Node(id=i, cluster_id=i, coords=coords[i]) for i in range(n)}
         self.adj = [[0]*n for i in range(n)] # full adj matrix
-        self.group_ids = defaultdict({i: [i] for i in range(n)}) # each in own cluster originally
-
+        self.group_ids = defaultdict(list)
+        for i in range(n):
+            self.group_ids[i] = [i]
         self.length = n
 
     def add_edge(self, u, v, weight):
@@ -61,10 +65,13 @@ class Graph:
     def merge_clusters(self, head, other):
 
         to_change = self.get_cluster_members(other)
-        changed_id = self.nodes[0].cluster_id
+        head_cluster = self.nodes[head].cluster_id
+
         for i in to_change:
-            self.nodes[i].cluster_id = self.nodes[head].cluster_id
-        self.group_ids.remove_key(changed_id)
+            self.nodes[i].cluster_id = head_cluster
+
+        self.group_ids[head_cluster].extend(self.group_ids.get(other, []))
+        self.group_ids.pop(other, None)
 
     def djikstra(self, id):
 
@@ -96,10 +103,11 @@ class Graph:
 
 def build_graph(points, ranges):
 
-    points = np.asarray(points, dtype=float)
+    x, y = points
+    points = np.column_stack((x, y))
     ranges = np.asarray(ranges, dtype=float)
     n = points.shape[0]
-    g = Graph(n)
+    g = Graph(n, coords=points)
 
     for i in range(n):
         g.nodes[i].pos = points[i]

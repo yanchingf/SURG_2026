@@ -43,8 +43,17 @@ def star_to_graph_mapping(skycoords): # need to update per iteration
     return build_graph(coords, brightness)
 
 
-def get_k_neighbors(coord, table): # get k closest stars from catalogue to the coord, check
-    return 
+def get_k_neighbors(skycoords, df, c=1, k=5): # get k closest stars from catalogue to the coord, check
+    
+    seps = skycoords.separation(skycoords)
+    k = min(k, len(df)) 
+
+    nearest_idx = np.argsort(seps)[:k]
+
+    neighbor_df = df.iloc[nearest_idx].reset_index(drop=True)
+    neighbor_seps = seps[nearest_idx]
+
+    return neighbor_df, neighbor_seps
 
 
 def plot_star_map(starcoords, graph, iteration, output_dir):

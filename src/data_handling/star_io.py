@@ -16,13 +16,13 @@ catalogue_fields = [
     (14, 25), # DM identification
     (25, 31), # HD number
     (31, 37), # SAO number
-    (74, 76), # RAh 
-    (76, 78), # RAm 
-    (78, 82), # RAs 
-    (82, 83), # DE sign
-    (83, 85), # DEd 
-    (85, 87), # DEm 
-    (87, 89), # DEs 
+    (75, 77), # RAh 
+    (77, 79), # RAm 
+    (79, 83), # RAs 
+    (83, 84), # DE sign
+    (84, 86), # DEd 
+    (86, 88), # DEm 
+    (89, 90), # DEs 
     (102, 107), # Vmag
     (109, 114), # B-V
     (127, 147), # Spectral type
@@ -107,6 +107,7 @@ def save_processed_data(df, filename="stars.csv"):
 
     print(f"Saved processed data to log.")
 
+
 def get_patch(df, constellation, short_name=True):
 
     ra = (df["RAh"].to_numpy(dtype=float)
@@ -124,9 +125,11 @@ def get_patch(df, constellation, short_name=True):
     mask = np.array(names) == constellation
     return df[mask].reset_index(drop=True)
 
+
 def get_all_star_data():
 
     df = parse_star_data()
+    save_processed_data(df=df,)
     return df
 
-
+get_all_star_data()

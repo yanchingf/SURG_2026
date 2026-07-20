@@ -59,6 +59,9 @@ def search(graph): # helper func for finding largest interaction
     return curr
 
 
+def smart_search(graph):
+    return
+
 def decimate(graph, obj):  # decimate node / edge
 
     if obj[2] == "Node":

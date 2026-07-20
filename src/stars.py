@@ -43,10 +43,10 @@ def star_to_graph_mapping(skycoords): # need to update per iteration
     return build_graph(coords, brightness)
 
 
-def get_k_neighbors(skycoords, df, c=1, k=5): # get k closest stars from catalogue to the coord, check
+def get_k_neighbors(coord, skycoords, df, k=5): # get k closest stars from catalogue to the coord, check
     
-    seps = skycoords.separation(skycoords)
-    k = min(k, len(df)) 
+    seps = coord.separation(skycoords)
+    k = min(k, len(df))
 
     nearest_idx = np.argsort(seps)[:k]
 
@@ -56,7 +56,7 @@ def get_k_neighbors(skycoords, df, c=1, k=5): # get k closest stars from catalog
     return neighbor_df, neighbor_seps
 
 
-def plot_star_map(starcoords, graph, iteration, output_dir):
+def plot_star_map(starcoords, graph, iteration, output_dir, patch_name=None, use_mollweide=False):
 
     n = len(starcoords)
 
@@ -64,33 +64,42 @@ def plot_star_map(starcoords, graph, iteration, output_dir):
     dec = Angle(starcoords.dec)
 
     fig = plt.figure(figsize=(8, 6))
-    ax = fig.add_subplot(111, projection="mollweide")
-    ax.scatter(ra.radian, dec.radian)
-    ax.grid(True)
+    if use_mollweide:
+        ax = fig.add_subplot(111, projection="mollweide")
+    else:
+        ax = fig.add_subplot(111)
+        ax.set_xlabel("RA (deg)")
+        ax.set_ylabel("Dec (deg)")
+
+    ra_vals = ra.radian if use_mollweide else np.asarray(ra.deg)
+    dec_vals = dec.radian if use_mollweide else np.asarray(dec.deg)
 
     for i in range(n-1):
         if graph.nodes[i].active == True:
             for j in range(i+1, n):
                 if graph.nodes[j].active and graph.adj[i][j] > 0:
-                    plt.plot([ra[i].radian, ra[j].radian],[dec[i].radian, dec[j].radian],
+                    ax.plot([ra_vals[i], ra_vals[j]], [dec_vals[i], dec_vals[j]],
                             color='gray', lw=0.8, alpha=0.5, zorder=1)
                     
     for i in range(n):
 
         color = cm.tab10(graph.nodes[i].cluster_id % 10) if graph.nodes[i].active else "gray"
 
-        ax.scatter(ra[i].radian, dec[i].radian, c=[color], s=40, zorder=3,)
-        ax.annotate(f"id={i}", (ra[i].radian, dec[i].radian), xytext=(5, 5),
+        ax.scatter(ra_vals[i], dec_vals[i], c=[color], s=40, zorder=3,)
+        ax.annotate(f"id={i}", (ra[i], dec[i]), xytext=(5, 5),
             textcoords="offset points", fontsize=7,)
-        ax.annotate(f"cluster={graph.nodes[i].cluster_id}", (ra[i].radian, dec[i].radian),
+        ax.annotate(f"cluster={graph.nodes[i].cluster_id}", (ra[i], dec[i]),
             xytext=(5, 15), textcoords="offset points", fontsize=5,)
 
-
-    ax.set_xticklabels([
-        "14h", "16h", "18h", "20h", "22h",
-        "0h", "2h", "4h", "6h", "8h", "10h"])
-
+    title = f"{patch_name} — step {iteration}" if patch_name else f"Step {iteration}"
+    ax.set_title(title)
     ax.grid(True)
+
+    if use_mollweide == False:
+        pad_ra = (ra_vals.max() - ra_vals.min()) * 0.1 + 0.5
+        pad_dec = (dec_vals.max() - dec_vals.min()) * 0.1 + 0.5
+        ax.set_xlim(ra_vals.min() - pad_ra, ra_vals.max() + pad_ra)
+        ax.set_ylim(dec_vals.min() - pad_dec, dec_vals.max() + pad_dec)
 
     fig.savefig(os.path.join(output_dir, f"step_{iteration}.png"))
     plt.close(fig)

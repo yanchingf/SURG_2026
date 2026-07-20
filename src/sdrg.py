@@ -18,6 +18,7 @@ from structures.graph_decimate import search
 from structures.graph_decimate import repair
 
 from src.data_handling.random_test import generate_random_graph
+from src.stars import plot_star_map
 
 from collections import Counter
 
@@ -38,10 +39,7 @@ def plot_graph(g, points, n, iteration, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_
         y.append(points[1][i])
 
         colors.append(g.nodes[i].cluster_id)
-
-        # need scaling for neg min size?
         sizes.append(max(0.001, g.nodes[i].range))
-
 
     for i in range(n):
         if g.nodes[i].active:
@@ -75,10 +73,10 @@ def plot_graph(g, points, n, iteration, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_
     plt.close(fig)
 
 
-def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True, inp=None, percolation_stats=False, 
+def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True, inp=None, 
+             percolation_stats=False, skycoords=None, patch_name=None,
              output_dir=os.path.join(os.path.dirname(__file__), '..', 'tests','runs')):
     
-
     if random:
         obj = generate_random_graph(n, neg_x_lim, x_lim, neg_y_lim, y_lim)
         g = obj[0]
@@ -104,12 +102,13 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
     os.makedirs(step_plot_dir, exist_ok=True)
     os.makedirs(stat_output_dir, exist_ok=True)
 
-    plot_graph(g, points, n, iteration=0, neg_x_lim=neg_x_lim, x_lim=x_lim, 
-               neg_y_lim=neg_y_lim, y_lim=y_lim, output_dir=step_plot_dir) # initial
+    if skycoords is None:
+        plot_graph(g, points, n, iteration=0, neg_x_lim=neg_x_lim, x_lim=x_lim, 
+               neg_y_lim=neg_y_lim, y_lim=y_lim, output_dir=step_plot_dir) 
+    else: 
+        plot_star_map(skycoords, g, iteration=0, output_dir=step_plot_dir, patch_name=patch_name) 
 
-    n_clusters = []
-    max_sizes = []
-    size_distro = []
+    n_clusters, max_sizes, size_distro= [], [], []
 
     while curr[1] != None:
 
@@ -119,8 +118,13 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
                 f.write(f"    id={g.nodes[i].id} h={g.nodes[i].range} cluster={g.nodes[i].cluster_id} active={g.nodes[i].active}\n")
 
         decimate(g, curr)
-        plot_graph(g, points, n, iteration, neg_x_lim=neg_x_lim, x_lim=x_lim,
-           neg_y_lim=neg_y_lim, y_lim=y_lim, output_dir=step_plot_dir)
+
+        if skycoords is None: 
+            plot_graph(g, points, n, iteration, neg_x_lim=neg_x_lim, x_lim=x_lim,
+            neg_y_lim=neg_y_lim, y_lim=y_lim, output_dir=step_plot_dir)
+        else: 
+            plot_star_map(skycoords, g, iteration=iteration, output_dir=step_plot_dir, patch_name=patch_name) 
+
 
         iteration += 1
 

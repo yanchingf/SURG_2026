@@ -22,17 +22,18 @@ catalogue_fields = [
     (83, 84), # DE sign
     (84, 86), # DEd 
     (86, 88), # DEm 
-    (89, 90), # DEs 
+    (88, 90), # DEs 
     (102, 107), # Vmag
     (109, 114), # B-V
     (127, 147), # Spectral type
+    (130, 132) # Constellation names
 ]
 
 field_names = [
     "HR", "Name", "DM", "HD", "SAO",
     "RAh", "RAm", "RAs",
     "DE_sign", "DEd", "DEm", "DEs",
-    "Vmag", "B-V", "SpType",
+    "Vmag", "B-V", "SpType", "Const-Info"
 ]
 
 
@@ -105,7 +106,7 @@ def save_processed_data(df, filename="stars.csv"):
     output_path = os.path.join(output_dir, filename)
     df.to_csv(output_path, index=False)
 
-    print(f"Saved processed data to log.")
+    print(f"Saved processed data to {output_path}.")
 
 
 def get_patch(df, constellation, short_name=True):
@@ -120,8 +121,8 @@ def get_patch(df, constellation, short_name=True):
             + df["DEm"].to_numpy(dtype=float) / 60
             + df["DEs"].to_numpy(dtype=float) / 3600)) * u.deg
 
-    sky_coords = SkyCoord(ra=ra, dec=dec, frame="icrs")
-    names = get_constellation(sky_coords, short_name=short_name)
+    skycoords = SkyCoord(ra=ra, dec=dec, frame="icrs")
+    names = get_constellation(skycoords, short_name=short_name)
     mask = np.array(names) == constellation
     return df[mask].reset_index(drop=True)
 
@@ -131,5 +132,3 @@ def get_all_star_data():
     df = parse_star_data()
     save_processed_data(df=df,)
     return df
-
-get_all_star_data()

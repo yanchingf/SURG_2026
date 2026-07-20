@@ -71,8 +71,8 @@ def plot_star_map(starcoords, graph, iteration, output_dir, patch_name=None, use
         ax.set_xlabel("RA (deg)")
         ax.set_ylabel("Dec (deg)")
 
-    ra_vals = ra.radian if use_mollweide else np.asarray(ra.deg)
-    dec_vals = dec.radian if use_mollweide else np.asarray(dec.deg)
+    ra_vals = ra.radian if use_mollweide else ra.to_value(u.deg)
+    dec_vals = dec.radian if use_mollweide else dec.to_value(u.deg)
 
     for i in range(n-1):
         if graph.nodes[i].active == True:
@@ -86,12 +86,12 @@ def plot_star_map(starcoords, graph, iteration, output_dir, patch_name=None, use
         color = cm.tab10(graph.nodes[i].cluster_id % 10) if graph.nodes[i].active else "gray"
 
         ax.scatter(ra_vals[i], dec_vals[i], c=[color], s=40, zorder=3,)
-        ax.annotate(f"id={i}", (ra[i], dec[i]), xytext=(5, 5),
+        ax.annotate(f"id={i}", (ra_vals[i], dec_vals[i]), xytext=(5, 5),
             textcoords="offset points", fontsize=7,)
-        ax.annotate(f"cluster={graph.nodes[i].cluster_id}", (ra[i], dec[i]),
+        ax.annotate(f"cluster={graph.nodes[i].cluster_id}", (ra_vals[i], dec_vals[i]),
             xytext=(5, 15), textcoords="offset points", fontsize=5,)
 
-    title = f"{patch_name} — step {iteration}" if patch_name else f"Step {iteration}"
+    title = f"{patch_name} — Step {iteration}" if patch_name else f"Step {iteration}"
     ax.set_title(title)
     ax.grid(True)
 
@@ -103,11 +103,4 @@ def plot_star_map(starcoords, graph, iteration, output_dir, patch_name=None, use
 
     fig.savefig(os.path.join(output_dir, f"step_{iteration}.png"))
     plt.close(fig)
-                    
-    
-
-
-
-
-
-    
+        

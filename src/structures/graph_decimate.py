@@ -93,7 +93,6 @@ def decimate(graph, obj):  # decimate node / edge
         for v in neighbors:
             graph.remove_edge(node_id, v)
 
-
     else:
 
         # if coupling, connected sites i and j go into same cluster

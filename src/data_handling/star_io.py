@@ -90,7 +90,7 @@ def get_coords_and_brightness(df, c=1): # convert RA / Dec => numeric cartesian 
     dec_deg = sky_coords.dec.to_value(u.deg)
     coords = np.column_stack((ra_deg, dec_deg))
 
-    brightness = ((7.0-df["Vmag"])*c).to_numpy(dtype=float)
+    brightness = ((6.5-df["Vmag"])*c).to_numpy(dtype=float) # need to check the min brightness value
 
     return (coords, brightness, sky_coords)
 

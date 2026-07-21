@@ -22,10 +22,6 @@ from src.data_handling.random_test import generate_random_graph
 from astropy import units as u
 from astropy.coordinates import Angle
 
-'''
-df = parse_star_data()
-save_processed_data(df)
-'''
 
 def star_to_graph_mapping(skycoords): # need to update per iteration
 
@@ -104,3 +100,26 @@ def plot_star_map(starcoords, graph, iteration, output_dir, patch_name=None, use
     fig.savefig(os.path.join(output_dir, f"step_{iteration}.png"))
     plt.close(fig)
         
+
+def compare_to_constellation(g, skycoords, patch_name, output_dir):
+
+    ra = Angle(skycoords.ra).wrap_at(180 * u.deg).to_value(u.deg)
+    dec = Angle(skycoords.dec).to_value(u.deg)
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+
+    ax1.scatter(ra, dec, c='tab:blue', s=50)
+    ax1.set_title(f"{patch_name}: ground truth (all same constellation)")
+
+    for i in range(len(ra)):
+        color = cm.tab10(g.nodes[i].cluster_id % 10)
+        ax2.scatter(ra[i], dec[i], c=[color], s=50)
+    ax2.set_title(f"{patch_name}: SDRG final clusters")
+
+    for ax in (ax1, ax2):
+        ax.set_xlabel("RA (deg)")
+        ax.set_ylabel("Dec (deg)")
+        ax.grid(True)
+
+    fig.savefig(os.path.join(output_dir, "cluster_vs_constellation.png"))
+    plt.close(fig)

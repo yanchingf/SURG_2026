@@ -6,22 +6,20 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 import numpy as np
 import matplotlib.pyplot as plt
 from collections import Counter
-
 from data_handling.star_io import get_all_star_data, get_patch, get_coords_and_brightness
-from structures.graph import build_graph
-from structures.graph_decimate import decimate
 
 from sdrg import run_sdrg
 
 from stars import plot_star_map
+from stars import final_visualization
 
 data = get_all_star_data()
 
-c_lower_lim = 1
-c_upper_lim = 5
+c_lower_lim = 3
+c_upper_lim = 3
 c_range = list(range(c_lower_lim, c_upper_lim + 1))
 
-patch_names = ["Cnc", "Ori", "UMa", "Cas", "Leo"]
+patch_names = ["Cnc"]
 
 output_dir = os.path.join(os.path.dirname(__file__), 'tests', 'runs')
 os.makedirs(output_dir, exist_ok=True)
@@ -45,6 +43,8 @@ for patch_name in patch_names:
 
     for c in c_range:
 
+        print(f"Running {patch_name} : c={c}")
+
         c_dir = os.path.join(patch_dir, f"c_{c}")
         os.makedirs(c_dir, exist_ok=True)
 
@@ -65,6 +65,7 @@ for patch_name in patch_names:
             output_dir=c_dir)
 
         plot_star_map(skycoords, g, iteration="final", output_dir=c_dir)
+        final_visualization(g, skycoords, patch_name, c_dir)
 
         cluster_sizes = Counter()
         for members in g.group_ids.values():
@@ -89,4 +90,4 @@ for patch_name in patch_names:
     fig.savefig(os.path.join(patch_dir, "max_cluster_size_vs_c.png"))
     plt.close(fig)
 
-    print(f"Done: {patch_name} ({len(c_range)} SDRG runs)")
+    print(f"Done: {patch_name} ({len(c_range)} runs)")

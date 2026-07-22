@@ -101,25 +101,26 @@ def plot_star_map(starcoords, graph, iteration, output_dir, patch_name=None, use
     plt.close(fig)
         
 
-def compare_to_constellation(g, skycoords, patch_name, output_dir):
+def final_visualization(g, skycoords, patch_name, output_dir, size_scale=20):
 
     ra = Angle(skycoords.ra).wrap_at(180 * u.deg).to_value(u.deg)
     dec = Angle(skycoords.dec).to_value(u.deg)
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+    fig, ax = plt.subplots(figsize=(8, 6))
 
-    ax1.scatter(ra, dec, c='tab:blue', s=50)
-    ax1.set_title(f"{patch_name}: ground truth (all same constellation)")
+    n = len(ra)
 
-    for i in range(len(ra)):
+    for i in range(n):
         color = cm.tab10(g.nodes[i].cluster_id % 10)
-        ax2.scatter(ra[i], dec[i], c=[color], s=50)
-    ax2.set_title(f"{patch_name}: SDRG final clusters")
+        rr = g.nodes[i].range
 
-    for ax in (ax1, ax2):
-        ax.set_xlabel("RA (deg)")
-        ax.set_ylabel("Dec (deg)")
-        ax.grid(True)
+        ax.scatter(ra[i], dec[i], c=[color], s=max(5, rr * size_scale), zorder=3)
 
-    fig.savefig(os.path.join(output_dir, "cluster_vs_constellation.png"))
+    ax.set_title(f"{patch_name}: SDRG final clusters")
+    ax.set_xlabel("RA (deg)")
+    ax.set_ylabel("Dec (deg)")
+    ax.set_aspect('equal')
+
+    fig.savefig(os.path.join(output_dir, f"final_clusters.png"))
     plt.close(fig)
+

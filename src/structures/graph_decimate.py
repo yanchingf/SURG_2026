@@ -10,9 +10,10 @@ from src.structures.graph import Graph
 
 import numpy as np
 
+
 def in_range(graph, u, v):
 
-    d = np.linalg.norm(graph.nodes[u].pos - graph.nodes[v].pos)
+    d = graph.adj[u][v]
     return d <= graph.nodes[u].range and d <= graph.nodes[v].range
 
 
@@ -27,7 +28,7 @@ def search(graph): # helper func for finding largest interaction
         return curr
 
     for node_id in active:
-        if graph.nodes[node_id].range > curr[0]:
+        if 1/graph.nodes[node_id].range > curr[0]:
             curr = (graph.nodes[node_id].range, node_id, "Node")
 
         for v in active:
@@ -59,8 +60,62 @@ def search(graph): # helper func for finding largest interaction
     return curr
 
 
+def filter(graph, i, j): # check if bond ij should be filtered -> set to -1 in adj matrix if so
+
+    neighbors = [v for v in range(graph.length) if (graph.adj[i][v] > graph.adj[i][j] 
+                and graph.nodes[v].active) and (graph.adj[j][v] > graph.adj[i][j]) and log()] # look for possible third node
+    
+    l =  len(neighbors) 
+    if l <= 0:
+        return
+    else:
+        graph.adj[i][j] = -1
+        return
+
+
 def smart_search(graph):
-    return
+
+    active = [i for i, n in graph.nodes.items() if n.active]
+    
+    curr = (-1, None, None)
+    best_distance_edge = (-1, None, None)
+    
+    if len(active) == 0:
+        return curr
+
+    for node_id in active:
+        if graph.nodes[node_id].range > curr[0]:
+            curr = (graph.nodes[node_id].range, node_id, "Node")
+
+        for v in active:
+            if v > node_id:
+                weight = graph.adj[node_id][v]
+                filter(graph, node_id, v)
+                if weight > 0:
+                    if in_range(graph, node_id, v):
+                        if weight > best_distance_edge[0]: # distance based edges should have priority
+                            best_distance_edge = (weight, (node_id, v), "Edge")
+                        elif weight == best_distance_edge[0]: # prioritize brighter edge cover if same 1/d
+                            curr_brightness = graph.nodes[node_id].range + graph.nodes[v].range
+                            best_u, best_v = best_distance_edge[1]
+                            best_brightness = graph.nodes[best_u].range + graph.nodes[best_v].range
+                            if curr_brightness > best_brightness:
+                                best_distance_edge = (weight, (node_id, v), "Edge")
+                    else:
+                        if weight > curr[0]: # new edges compete with nodes based on literal value
+                            curr = (weight, (node_id, v), "Edge")
+
+        has_distance_edge = [graph.adj[node_id][v] > 0 and in_range(graph, node_id, v)
+                            for v in active if v != node_id]
+        
+        if len(has_distance_edge) <= 0 and graph.nodes[node_id].range > curr[0]:
+            curr = (graph.nodes[node_id].range, node_id, "Node")
+
+    if best_distance_edge[1] != None:
+        return best_distance_edge
+
+    return curr
+
 
 def decimate(graph, obj):  # decimate node / edge
 
@@ -124,19 +179,19 @@ def decimate(graph, obj):  # decimate node / edge
             if graph.adj[v_id][k] > 0:
                 graph.remove_edge(v_id, k)
 
-    return 
+    return l
 
 
-def repair(graph):
+def repair(graph, l): # only check affected
 
     n = len(graph.nodes)
 
     for i in range(n): # repair edge iff in range
         for j in range(i + 1, n):
 
-            if in_range(graph, i, j) and (graph.nodes[j].active and graph.nodes[i].active):
+            if (graph.nodes[j].active and graph.nodes[i].active) and in_range(graph, i, j):
 
-                if graph.adj[i][j] == 0:
+                if graph.adj[i][j] == 0: # check for deleted edges?
 
                     d = np.linalg.norm(graph.nodes[i].pos - graph.nodes[j].pos)
                     graph.add_edge(i, j, 1/max(d, 1e-9))

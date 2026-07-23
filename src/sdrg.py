@@ -236,7 +236,6 @@ def run_fast_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=
         else: 
             plot_star_map(skycoords, g, iteration=iteration, output_dir=step_plot_dir, patch_name=patch_name) 
 
-
         iteration += 1
 
         curr = repair(g)

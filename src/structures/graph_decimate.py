@@ -60,17 +60,18 @@ def search(graph): # helper func for finding largest interaction
     return curr
 
 
-def filter(graph, i, j): # check if bond ij should be filtered -> set to -1 in adj matrix if so
+def filter_bond(graph, i, j):  # check if bond ij should be filtered -> set to -1 in adj matrix if so
 
-    neighbors = [v for v in range(graph.length) if (graph.adj[i][v] > graph.adj[i][j] 
-                and graph.nodes[v].active) and (graph.adj[j][v] > graph.adj[i][j]) and log()] # look for possible third node
-    
-    l =  len(neighbors) 
+    neighbors = [v for v in range(graph.length) if (graph.adj[i][v] > graph.adj[i][j]
+                and graph.nodes[v].active) and (graph.adj[j][v] > graph.adj[i][j])]  # look for possible third node
+
+    l = len(neighbors)
     if l <= 0:
-        return
-    else:
-        graph.adj[i][j] = -1
-        return
+        return -1
+
+    for k in range(l):
+        if graph.adj[][] - graph.adj[][] - graph.nodes[k].range:
+            return
 
 
 def smart_search(graph):
@@ -179,10 +180,10 @@ def decimate(graph, obj):  # decimate node / edge
             if graph.adj[v_id][k] > 0:
                 graph.remove_edge(v_id, k)
 
-    return l
+    return
 
 
-def repair(graph, l): # only check affected
+def repair(graph): # only check affected
 
     n = len(graph.nodes)
 

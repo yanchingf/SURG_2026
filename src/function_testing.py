@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 from collections import Counter
 from data_handling.star_io import get_all_star_data, get_patch, get_coords_and_brightness
 
-
 from sdrg import run_fast_sdrg
+from graph_decimate import filter_
 
 from stars import plot_star_map
 from stars import final_visualization

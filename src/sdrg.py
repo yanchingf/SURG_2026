@@ -14,6 +14,7 @@ from structures.graph import build_graph
 from structures.graph_decimate import decimate
 from structures.graph_decimate import smart_search
 from structures.graph_decimate import search
+from structures.graph_decimate import in_range
 from structures.graph_decimate import repair
 
 from src.data_handling.random_test import generate_random_graph
@@ -44,7 +45,7 @@ def plot_graph(g, points, n, iteration, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_
         if g.nodes[i].active:
             num_cluster = max(num_cluster, g.nodes[i].cluster_id + 1)
             for j in range(i+1, n):
-                if g.nodes[j].active and g.adj[i][j] > 0:
+                if g.nodes[j].active and g.adj[i][j] > 0 and in_range(g, i, j):
                     plt.plot([points[0][i], points[0][j]],
                             [points[1][i], points[1][j]],
                             color='gray', lw=0.8, alpha=0.5, zorder=1)
@@ -107,16 +108,22 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
     else: 
         plot_star_map(skycoords, g, iteration=0, output_dir=step_plot_dir, patch_name=patch_name) 
 
+    with open(txt_f, "a", encoding="utf-8") as f:
+        f.write(f"Step 0 | Ω=initial\n")
+        for i in range(n):
+            f.write(f"    id={g.nodes[i].id} h={g.nodes[i].range} "
+                    f"cluster={g.nodes[i].cluster_id} active={g.nodes[i].active}\n")
+            
     n_clusters, max_sizes, size_distro= [], [], []
 
-    while curr[1] != None:
+    while curr[0] != None:
 
         with open(txt_f, "a", encoding="utf-8") as f:
             f.write(f"Step {iteration} | Ω={curr}\n") # write log
             for i in range(n):
                 f.write(f"    id={g.nodes[i].id} h={g.nodes[i].range} cluster={g.nodes[i].cluster_id} active={g.nodes[i].active}\n")
 
-        decimate(g, curr)
+        up = decimate(g, curr)
 
         if skycoords is None: 
             plot_graph(g, points, n, iteration, neg_x_lim=neg_x_lim, x_lim=x_lim,
@@ -127,7 +134,7 @@ def run_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=True,
 
         iteration += 1
 
-        curr = repair(g)
+        g = repair(g)
         curr = search(g)
 
         if percolation_stats == True:
@@ -223,12 +230,13 @@ def run_fast_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=
 
     while curr[1] != None:
 
+        decimate(g, curr)
+
         with open(txt_f, "a", encoding="utf-8") as f:
             f.write(f"Step {iteration} | Ω={curr}\n") # write log
             for i in range(n):
                 f.write(f"    id={g.nodes[i].id} h={g.nodes[i].range} cluster={g.nodes[i].cluster_id} active={g.nodes[i].active}\n")
 
-        decimate(g, curr)
 
         if skycoords is None: 
             plot_graph(g, points, n, iteration, neg_x_lim=neg_x_lim, x_lim=x_lim,
@@ -236,10 +244,8 @@ def run_fast_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=
         else: 
             plot_star_map(skycoords, g, iteration=iteration, output_dir=step_plot_dir, patch_name=patch_name) 
 
-
         iteration += 1
 
-        curr = repair(g)
         curr = smart_search(g)
 
         if percolation_stats == True:
@@ -295,3 +301,18 @@ def run_fast_sdrg(n=1, neg_x_lim=0, x_lim=5000, neg_y_lim=0, y_lim=5000, random=
     return g
 
 
+
+
+
+x = [100, 200, 300, 300]
+y = [100, 100, 100, 300]
+r = [120, 120, 120, 250]
+
+
+
+test_output_dir = os.path.join(
+    os.path.dirname(__file__), '..', 'tests', 'sdrg-test-plots',
+    datetime.now().strftime("%Y%m%d_%H%M%S")
+)
+
+run_sdrg(5, 0, 500, 0, 500, False, (x, y, r), output_dir=test_output_dir)

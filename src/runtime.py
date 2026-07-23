@@ -18,9 +18,10 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 from structures.graph import build_graph
-from structures.graph_decimate import search, decimate, repair
+from structures.graph_decimate import search, decimate
 
 matplotlib.use("Agg")
+
 
 def make_random_graph(n, seed=0, box=100.0, min_range=5.0, max_range=25.0):
 

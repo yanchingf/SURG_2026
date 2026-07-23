@@ -116,8 +116,7 @@ def build_graph(points, ranges):
     for i in range(n):
         for j in range(i + 1, n):
             d = np.linalg.norm(points[i] - points[j])
-            if d <= ranges[i] and d <= ranges[j]:
-                g.add_edge(i, j, 1/max(d, 1e-9))
+            g.add_edge(i, j, d)
 
     return g
  

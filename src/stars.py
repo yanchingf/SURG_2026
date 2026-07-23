@@ -16,7 +16,6 @@ from structures.graph import Graph
 from structures.graph import build_graph
 from structures.graph_decimate import decimate
 from structures.graph_decimate import search
-from structures.graph_decimate import repair
 from src.data_handling.random_test import generate_random_graph
 
 from astropy import units as u
